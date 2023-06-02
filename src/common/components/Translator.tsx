@@ -1205,7 +1205,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const onCsvExport = async () => {
         try {
             const words = await vocabularyService.listItems()
-            await exportToCsv<VocabularyItem>(`futurenav-xj-assistant-collection-${new Date().valueOf()}`, words)
+            await exportToCsv<VocabularyItem>(`future-xiaojun-assistant-collection-${new Date().valueOf()}`, words)
             if (isDesktopApp()) {
                 toast(t('csv file saved on Desktop'), {
                     duration: 5000,
@@ -1260,7 +1260,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     return (
         <div
             className={clsx(styles.popupCard, {
-                'futurenav-dark': themeType === 'dark',
+                'yetone-dark': themeType === 'dark',
             })}
             style={{
                 minHeight: vocabularyType !== 'hide' ? '600px' : undefined,

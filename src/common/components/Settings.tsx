@@ -488,8 +488,8 @@ function Ii18nSelector({ value, onChange, onBlur }: Ii18nSelectorProps) {
     const { i18n } = useTranslation()
 
     const options = [
-        { label: 'English', id: 'en' },
         { label: '简体中文', id: 'zh-Hans' },
+        { label: 'English', id: 'en' },
         { label: '繁體中文', id: 'zh-Hant' },
         { label: '日本語', id: 'ja' },
         { label: 'ไทย', id: 'th' },
@@ -506,7 +506,7 @@ function Ii18nSelector({ value, onChange, onBlur }: Ii18nSelectorProps) {
                     ? [
                           {
                               id: value,
-                              label: options.find((option) => option.id === value)?.label || 'en',
+                              label: options.find((option) => option.id === value)?.label || 'zh-Hans',
                           },
                       ]
                     : undefined

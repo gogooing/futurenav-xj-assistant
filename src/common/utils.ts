@@ -4,7 +4,8 @@ import { BaseDirectory, writeTextFile } from '@tauri-apps/api/fs'
 import { IBrowser, ISettings } from './types'
 import { getUniversalFetch } from './universal-fetch'
 
-export const defaultAPIURL = 'https://api.openai.com'
+export const defaultAPIURL = 'https://xiaojunai.com/api'
+export const defaultOpenAiAPIURL = 'https://api.openai.com'
 export const defaultAPIURLPath = '/v1/chat/completions'
 export const defaultProvider = 'OpenAI'
 export const defaultAPIModel = 'gpt-3.5-turbo'
@@ -143,7 +144,7 @@ export const isFirefox = () => /firefox/i.test(navigator.userAgent)
 
 export const isUsingOpenAIOfficialAPIEndpoint = async () => {
     const settings = await getSettings()
-    return settings.provider === defaultProvider && settings.apiURL === defaultAPIURL
+    return settings.provider === defaultProvider && settings.apiURL === defaultOpenAiAPIURL
 }
 
 export const isUsingOpenAIOfficial = async () => {
