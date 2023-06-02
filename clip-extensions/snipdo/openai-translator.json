@@ -1,0 +1,12 @@
+{
+    "name": "XiaoJun Assistant",
+    "identifier": "xj.futurenav.apps.futurenav-xj-assistant.clip-extensions.snipdo",
+    "icon": "icon.png",
+    "actions": [
+        {
+            "title": "XiaoJun Assistant",
+            "icon": "icon.png",
+            "powershellFile": "futurenav-xj-assistant.ps1"
+        }
+    ]
+}

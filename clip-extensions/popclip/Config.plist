@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>Actions</key>
+        <array>
+            <dict>
+                <key>Shell Script File</key>
+                <string>futurenav-xj-assistant.sh</string>
+                <key>Image File</key>
+                <string>icon.png</string>
+                <key>Title</key>
+                <string>XiaoJun Assistant</string>
+            </dict>
+        </array>
+        <key>Credits</key>
+        <array>
+            <dict>
+                <key>Link</key>
+                <string>https://github.com/gogooing/futurenav-xj-assistant</string>
+                <key>Name</key>
+                <string>XiaoJun Assistant</string>
+            </dict>
+        </array>
+        <key>Extension Description</key>
+        <string>Translate text with XiaoJun Assistant.</string>
+        <key>Extension Identifier</key>
+        <string>xj.futurenav.apps.futurenav-xj-assistant.clip-extensions.popclip</string>
+        <key>Extension Image File</key>
+        <string>futurenav-xj-assistant.png</string>
+        <key>Extension Name</key>
+        <string>XiaoJun Assistant</string>
+        <key>Required OS Version</key>
+        <string>10.13</string>
+    </dict>
+</plist>
