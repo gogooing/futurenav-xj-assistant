@@ -1,6 +1,8 @@
 # futurenav-xj-assistant
 XiaoJun Assistant
 
+同步
+fix: rate and volume settings not work properly (#807)
 
 # 如何编译
 
