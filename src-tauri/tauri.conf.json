@@ -8,7 +8,7 @@
   },
   "package": {
     "productName": "晓君助手",
-    "version": "0.1.2"
+    "version": "0.1.3"
   },
   "tauri": {
     "allowlist": {
@@ -79,6 +79,9 @@
       "shortDescription": "",
       "targets": "all",
       "windows": {
+        "wix":{
+          "language": "zh-CN" 
+        },
         "certificateThumbprint": null,
         "digestAlgorithm": "sha256",
         "timestampUrl": "",
