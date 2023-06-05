@@ -3,7 +3,7 @@ send_text() {
 }
 
 if ! send_text; then
-    open -g -a XiaoJun\ Assistant
+    open -g -a 晓君助手
     sleep 2
     send_text
 fi
