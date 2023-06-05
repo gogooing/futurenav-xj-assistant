@@ -80,3 +80,6 @@ git代理代理没配置+http代理没配置+关了VPN
 git tag v0.1.1 
 
 git push --tag    
+
+
+.popclipext
