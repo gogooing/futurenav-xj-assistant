@@ -380,28 +380,52 @@ interface IActionStrItem {
 
 const actionStrItems: Record<TranslateMode, IActionStrItem> = {
     'analyze': {
-        beforeStr: 'Analyzing...',
-        afterStr: 'Analyzed',
+        beforeStr: '正在分析...',
+        afterStr: '分析完成',
     },
     'polishing': {
-        beforeStr: 'Polishing...',
-        afterStr: 'Polished',
+        beforeStr: '正在润色...',
+        afterStr: '润色完成',
     },
     'translate': {
-        beforeStr: 'Translating...',
-        afterStr: 'Translated',
+        beforeStr: '正在翻译...',
+        afterStr: '翻译完成',
     },
     'summarize': {
-        beforeStr: 'Summarizing...',
-        afterStr: 'Summarized',
+        beforeStr: '正在总结...',
+        afterStr: '总结完成',
+    },
+    'improve-writing': {
+        beforeStr: '正在提高写作...',
+        afterStr: '完成写作',
+    },
+    'continue-writing': {
+        beforeStr: '正在继续写作...',
+        afterStr: '完成写作',
+    },
+    'topic-writing': {
+        beforeStr: '正在主题写作...',
+        afterStr: '完成写作',
+    },
+    'make-longer': {
+        beforeStr: '正在加长...',
+        afterStr: '完成加长',
+    },
+    'make-shorter': {
+        beforeStr: '正在缩短...',
+        afterStr: '完成缩短',
+    },
+    'explain-text': {
+        beforeStr: '正在解释...',
+        afterStr: '解释完成',
     },
     'explain-code': {
-        beforeStr: 'Explaining...',
-        afterStr: 'Explained',
+        beforeStr: '正在解释代码...',
+        afterStr: '解释完成',
     },
     'big-bang': {
-        beforeStr: 'Writing...',
-        afterStr: 'Written',
+        beforeStr: '正在写作...',
+        afterStr: '写作完成',
     },
 }
 
@@ -1295,7 +1319,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                         <div data-tauri-drag-region className={styles.iconContainer}>
                             <img data-tauri-drag-region className={styles.icon} src={icon} />
                             <div data-tauri-drag-region className={styles.iconText} ref={logoTextRef}>
-                                OpenAI Translator
+                                {t('APP Name')}
                             </div>
                         </div>
                         <div className={styles.popupCardHeaderActionsContainer} ref={languagesSelectorRef}>
@@ -1646,7 +1670,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                     }}
                                                 >
                                                     {
-                                                        'Please press <Enter> to submit. Press <Shift+Enter> to start a new line.'
+                                                        t('Please press enter.')
                                                     }
                                                 </div>
                                                 <Button

@@ -9,7 +9,7 @@ import { getUniversalFetch } from './universal-fetch'
 import { Action } from './internal-services/db'
 import { codeBlock, oneLine, oneLineTrim } from 'common-tags'
 
-export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'explain-code' | 'big-bang'
+export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'improve-writing' | 'continue-writing' | 'topic-writing' | 'make-longer' | 'make-shorter' | 'explain-text' | 'explain-code' | 'big-bang'
 export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure'
 export type APIModel =
     | 'gpt-3.5-turbo'
@@ -378,6 +378,51 @@ export async function translate(query: TranslateQuery) {
                 Please translate this text to ${targetLangName}
                 and explain the grammar in the original text using ${targetLangName}.
                 Only analyze the text between ${quoteProcessor.quoteStart}
+                and ${quoteProcessor.quoteEnd}.`
+                contentPrompt = `${quoteProcessor.quoteStart}${query.text}${quoteProcessor.quoteEnd}`
+                break
+            case 'improve-writing':
+                rolePrompt =
+                    'I want you to play the role of an editor and help me improve my writing. I hope that you can replace my sentences with more beautiful, elegant, and sophisticated writing techniques while keeping the meaning unchanged but making them more literary. I only expect corrections and improvements from you without any explanations.'
+                commandPrompt = oneLine`
+                Please continue writing this article in the same language as the text: `
+                contentPrompt = '\n\n' + query.text + '\n\n'
+                break
+            case 'continue-writing':
+                rolePrompt =
+                    'I want you can play the role of an editor and help me continue writing. I want you can continue writing based on my work, and try to imitate my writing habits and techniques as much as possible. I only expect you to continue writing my work without any explanation needed.'
+                commandPrompt = oneLine`
+                Please continue writing this article in the same language as the text: `
+                contentPrompt = '\n\n' + query.text + '\n\n'
+                break
+            case 'topic-writing':
+                rolePrompt =
+                    'I want you can play the role of an editor and help me complete my writing. I will give you a topic, and you need to create an excellent article based on this topic. I only expect you to write about my topic without any explanation.'
+                commandPrompt = oneLine`
+                Please use the topic I provided to write an excellent article with no less than 800 words. The content should be professional and written in the same language as the topic I provided. The topic is: `
+                contentPrompt = '\n\n' + query.text + '\n\n'
+                break
+            case 'make-longer':
+                rolePrompt =
+                    'I want you can play the role of an editor and help me improve my writing. I want you can assist me in extending my writing without changing the meaning. I only expect you to lengthen my work without any explanations.'
+                commandPrompt = oneLine`
+                Please extend the article without changing its meaning. Please use the same language as the article provided below: `
+                contentPrompt = '\n\n' + query.text + '\n\n'
+                break
+            case 'make-shorter':
+                rolePrompt =
+                    'I want you can play the role of an editor and help me improve my writing. I would like you to assist me in shortening my work without changing its meaning. I only expect you to shorten my work without any explanation.'
+                commandPrompt = oneLine`
+                Please shorten the article without changing its meaning. Please use the same language as the article provided below: `
+                contentPrompt = '\n\n' + query.text + '\n\n'
+                break
+            case 'explain-text':
+                rolePrompt = 'I want you to explain a complex topic to me as if I were 18 years old or younger and had no prior knowledge of the subject.'
+                quoteProcessor = new QuoteProcessor()
+                commandPrompt = oneLine`
+                Please translate this text to ${targetLangName}
+                explain a complex topic using ${targetLangName}.
+                Only explain the text between ${quoteProcessor.quoteStart}
                 and ${quoteProcessor.quoteEnd}.`
                 contentPrompt = `${quoteProcessor.quoteStart}${query.text}${quoteProcessor.quoteEnd}`
                 break

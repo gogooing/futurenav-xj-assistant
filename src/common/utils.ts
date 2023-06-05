@@ -15,7 +15,7 @@ export const defaultChatGPTWebAPI = 'https://chat.openai.com/backend-api'
 export const defaultAutoTranslate = false
 export const defaultTargetLanguage = 'zh-Hans'
 export const defaultSelectInputElementsText = true
-export const defaulti18n = 'en'
+export const defaulti18n = 'zh-Hans'
 
 export async function getApiKey(): Promise<string> {
     const settings = await getSettings()

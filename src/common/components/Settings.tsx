@@ -489,8 +489,8 @@ function Ii18nSelector({ value, onChange, onBlur }: Ii18nSelectorProps) {
 
     const options = [
         { label: '简体中文', id: 'zh-Hans' },
-        { label: 'English', id: 'en' },
         { label: '繁體中文', id: 'zh-Hant' },
+        { label: 'English', id: 'en' },
         { label: '日本語', id: 'ja' },
         { label: 'ไทย', id: 'th' },
     ]
@@ -881,14 +881,13 @@ function HotkeyRecorder({ value, onChange, onBlur }: IHotkeyRecorderProps) {
 function ProviderSelector({ value, onChange }: IProviderSelectorProps) {
     const options = utils.isDesktopApp()
         ? ([
-              { label: 'OpenAI', id: 'OpenAI' },
-              { label: 'Azure', id: 'Azure' },
+              { label: 'XiaoJun', id: 'OpenAI' },
           ] as {
               label: string
               id: Provider
           }[])
         : ([
-              { label: 'OpenAI', id: 'OpenAI' },
+              { label: 'XiaoJun', id: 'OpenAI' },
               { label: 'ChatGPT (Web)', id: 'ChatGPT' },
               { label: 'Azure', id: 'Azure' },
           ] as {
@@ -1068,10 +1067,10 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
             >
                 <img width='22' src={icon} alt='logo' />
                 <h2>
-                    XiaoJun Assistant
+                    {t('APP Name')}
                     {AppConfig?.version ? (
                         <a
-                            href='https://github.com/gogooing/futurenav-xj-assistant/releases'
+                            href='https://xiaojunai.com'
                             target='_blank'
                             rel='noreferrer'
                             style={{
@@ -1103,31 +1102,6 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                         required
                         name='apiKeys'
                         label={t('API Key')}
-                        caption={
-                            <div>
-                                {t('Go to the')}{' '}
-                                {values.provider === 'Azure' ? (
-                                    <a
-                                        target='_blank'
-                                        href='https://learn.microsoft.com/en-us/azure/cognitive-services/openai/chatgpt-quickstart?tabs=command-line&pivots=rest-api#retrieve-key-and-endpoint'
-                                        rel='noreferrer'
-                                    >
-                                        {t('Azure OpenAI Service page')}
-                                    </a>
-                                ) : (
-                                    <a
-                                        target='_blank'
-                                        href='https://platform.openai.com/account/api-keys'
-                                        rel='noreferrer'
-                                    >
-                                        {t('OpenAI page')}
-                                    </a>
-                                )}{' '}
-                                {t(
-                                    'to get your API Key. You can separate multiple API Keys with English commas to achieve quota doubling and load balancing.'
-                                )}
-                            </div>
-                        }
                     >
                         <Input autoFocus type='password' size='compact' onBlur={onBlur} />
                     </FormItem>
