@@ -75,3 +75,8 @@ git代理代理没配置+http代理没配置+关了VPN
 
 提示
 成功了
+
+
+git tag v0.1.1 
+
+git push --tag    
