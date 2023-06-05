@@ -1137,13 +1137,6 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                                 }}
                             >
                                 {t('It is highly recommended to disable this feature and use the Clip Extension')}
-                                <a
-                                    href='https://github.com/gogooing/futurenav-xj-assistant/blob/main/CLIP-EXTENSIONS.md'
-                                    target='_blank'
-                                    rel='noreferrer'
-                                >
-                                    {t('Clip Extension')}
-                                </a>
                             </div>
                         )
                     }

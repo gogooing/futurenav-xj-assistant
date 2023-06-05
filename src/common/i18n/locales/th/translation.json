@@ -73,7 +73,7 @@
   "Using clipboard": "ใช้คลิปบอร์ด",
   "Allow using the clipboard to get the selected text when the selected text is not available": "อนุญาตให้ใช้คลิปบอร์ดเพื่อรับข้อความที่เลือกเมื่อข้อความที่เลือกไม่สามารถใช้ได้",
   "Please login to ChatGPT Web": "กรุณาเข้าสู่ระบบ ChatGPT Web",
-  "It is highly recommended to disable this feature and use the Clip Extension": "แนะนำให้ปิดใช้งานคุณสมบัตินี้และใช้ Clip Extension",
+  "It is highly recommended to disable this feature and use the Clip Extension": "แนะนำอย่างแรงกับการปิดฟีเจอร์นี้และใช้ส่วนขยาย PopClip ที่ให้โดย XiaoJun",
   "Clip Extension": "ส่วนขยายคลิป",
   "built-in": "ภายใน",
   "Default Action": "การดำเนินการเริ่มต้น",

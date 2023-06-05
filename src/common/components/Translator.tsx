@@ -1669,9 +1669,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                         marginRight: '-20px',
                                                     }}
                                                 >
-                                                    {
-                                                        t('Please press enter.')
-                                                    }
+                                                    {t('Please press enter')}
                                                 </div>
                                                 <Button
                                                     size='mini'
