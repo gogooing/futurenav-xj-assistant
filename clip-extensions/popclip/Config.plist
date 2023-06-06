@@ -10,7 +10,7 @@
                 <key>Image File</key>
                 <string>icon.png</string>
                 <key>Title</key>
-                <string>晓君助手</string>
+                <string>XiaoJun Assistant</string>
             </dict>
         </array>
         <key>Credits</key>
@@ -29,7 +29,7 @@
         <key>Extension Image File</key>
         <string>futurenav-xj-assistant.png</string>
         <key>Extension Name</key>
-        <string>XiaoJun Assistant</string>
+        <string>晓君助手</string>
         <key>Required OS Version</key>
         <string>10.13</string>
     </dict>
