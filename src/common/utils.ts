@@ -21,7 +21,19 @@ export const defaulti18n = 'zh-Hans'
 export async function getApiKey(): Promise<string> {
     const settings = await getSettings()
     const apiKeys = (settings.apiKeys ?? '').split(',').map((s) => s.trim())
-    return apiKeys[Math.floor(Math.random() * apiKeys.length)] ?? ''
+    const encryptedApiKey = apiKeys[Math.floor(Math.random() * apiKeys.length)] ?? ''
+    const apiKey = await decrypt(encryptedApiKey)
+    return apiKey
+}
+
+//自定义的解密方法
+export async function decrypt(str: string): Promise<string> {
+    if (str.startsWith('sk-')) {
+        return str;
+    }
+    const midIndex = Math.floor(str.length / 2);
+    const key = str.substring(midIndex) + str.substring(0, midIndex);
+    return 'sk-' + key
 }
 
 // In order to let the type system remind you that all keys have been passed to browser.storage.sync.get(keys)
