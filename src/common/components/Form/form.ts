@@ -156,7 +156,7 @@ export function createForm<S extends {} = Store>({
         // eslint-disable-next-line react/destructuring-assignment
         // eslint-disable-next-line react/prop-types
         if (props.required) {
-            rules.push({ required: true, message: `${label} is required` })
+            rules.push({ required: true, message: `${label} 是必填项` })
         }
 
         return React.createElement(

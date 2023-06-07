@@ -157,10 +157,10 @@ function ThemeTypeSelector({ value, onChange, onBlur }: IThemeTypeSelectorProps)
             value={
                 value
                     ? [
-                          {
-                              id: value,
-                          },
-                      ]
+                        {
+                            id: value,
+                        },
+                    ]
                     : []
             }
             onChange={(params) => {
@@ -213,9 +213,9 @@ const ttsProviderOptions: {
     label: string
     id: TTSProvider
 }[] = [
-    { label: 'Edge TTS', id: 'EdgeTTS' },
-    { label: 'System Default', id: 'WebSpeech' },
-]
+        { label: 'XiaoJun TTS', id: 'EdgeTTS' },
+        { label: 'System Default', id: 'WebSpeech' },
+    ]
 
 function TTSVoicesSettings({ value, onChange, onBlur }: TTSVoicesSettingsProps) {
     const { t } = useTranslation()
@@ -228,7 +228,7 @@ function TTSVoicesSettings({ value, onChange, onBlur }: TTSVoicesSettingsProps) 
     const [supportVoices, setSupportVoices] = useState<SpeechSynthesisVoice[]>([])
 
     useEffect(() => {
-        ;(async () => {
+        ; (async () => {
             switch (value?.provider ?? 'WebSpeech') {
                 case 'EdgeTTS':
                     setSupportVoices(await getEdgeVoices())
@@ -463,12 +463,13 @@ function TTSVoicesSettings({ value, onChange, onBlur }: TTSVoicesSettingsProps) 
                     )}
                     <Button
                         size='mini'
-                        startEnhancer={() => <IoMdAdd size={12} />}
+                        startEnhancer={() => <IoMdAdd size={15} />}
                         onClick={(e) => {
                             e.preventDefault()
                             e.stopPropagation()
                             setShowLangSelector(true)
                         }}
+                        style={{ width: '80px' }}
                     >
                         {t('Add')}
                     </Button>
@@ -504,17 +505,17 @@ function Ii18nSelector({ value, onChange, onBlur }: Ii18nSelectorProps) {
             value={
                 value
                     ? [
-                          {
-                              id: value,
-                              label: options.find((option) => option.id === value)?.label || 'zh-Hans',
-                          },
-                      ]
+                        {
+                            id: value,
+                            label: options.find((option) => option.id === value)?.label || 'zh-Hans',
+                        },
+                    ]
                     : undefined
             }
             onChange={(params) => {
                 onChange?.(params.value[0].id as string)
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                ;(i18n as any).changeLanguage(params.value[0].id as string)
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    ; (i18n as any).changeLanguage(params.value[0].id as string)
             }}
             options={options}
         />
@@ -546,17 +547,17 @@ function APIModelSelector({ provider, value, onChange, onBlur }: APIModelSelecto
         setOptions([])
         if (provider === 'OpenAI') {
             setOptions([
-                { label: 'gpt-3.5-turbo', id: 'gpt-3.5-turbo' },
-                { label: 'gpt-3.5-turbo-0301', id: 'gpt-3.5-turbo-0301' },
-                { label: 'gpt-4', id: 'gpt-4' },
-                { label: 'gpt-4-0314', id: 'gpt-4-0314' },
-                { label: 'gpt-4-32k', id: 'gpt-4-32k' },
-                { label: 'gpt-4-32k-0314', id: 'gpt-4-32k-0314' },
+                { label: 'XiaoJun 3.5', id: 'gpt-3.5-turbo' },
+                { label: 'XiaoJun 3.5 0301', id: 'gpt-3.5-turbo-0301' },
+                { label: 'XiaoJun 4', id: 'gpt-4' },
+                { label: 'XiaoJun 4 0314', id: 'gpt-4-0314' },
+                { label: 'XiaoJun 4 32k', id: 'gpt-4-32k' },
+                { label: 'XiaoJun 4 32k 0314', id: 'gpt-4-32k-0314' },
             ])
         } else if (provider === 'ChatGPT') {
             setIsLoading(true)
             try {
-                ;(async () => {
+                ; (async () => {
                     const sessionResp = await fetcher(utils.defaultChatGPTAPIAuthSession, { cache: 'no-cache' })
                     if (sessionResp.status !== 200) {
                         setIsChatGPTNotLogin(true)
@@ -609,10 +610,10 @@ function APIModelSelector({ provider, value, onChange, onBlur }: APIModelSelecto
                 value={
                     value
                         ? [
-                              {
-                                  id: value,
-                              },
-                          ]
+                            {
+                                id: value,
+                            },
+                        ]
                         : undefined
                 }
                 onChange={(params) => {
@@ -881,19 +882,19 @@ function HotkeyRecorder({ value, onChange, onBlur }: IHotkeyRecorderProps) {
 function ProviderSelector({ value, onChange }: IProviderSelectorProps) {
     const options = utils.isDesktopApp()
         ? ([
-              { label: 'XiaoJun', id: 'OpenAI' },
-          ] as {
-              label: string
-              id: Provider
-          }[])
+            { label: 'XiaoJun', id: 'OpenAI' },
+        ] as {
+            label: string
+            id: Provider
+        }[])
         : ([
-              { label: 'XiaoJun', id: 'OpenAI' },
-              { label: 'ChatGPT (Web)', id: 'ChatGPT' },
-              { label: 'Azure', id: 'Azure' },
-          ] as {
-              label: string
-              id: Provider
-          }[])
+            { label: 'XiaoJun', id: 'OpenAI' },
+            { label: 'ChatGPT (Web)', id: 'ChatGPT' },
+            { label: 'Azure', id: 'Azure' },
+        ] as {
+            label: string
+            id: Provider
+        }[])
 
     return (
         <Select
@@ -949,7 +950,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
 
     const [loading, setLoading] = useState(false)
     const [values, setValues] = useState<ISettings>({
-        apiKeys: '',
+        apiKeys: utils.defaultAPIKEY,
         apiURL: utils.defaultAPIURL,
         apiURLPath: utils.defaultAPIURLPath,
         apiModel: utils.defaultAPIModel,
@@ -976,7 +977,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
 
     useEffect(() => {
         if (settings) {
-            ;(async () => {
+            ; (async () => {
                 if (isTauri) {
                     const { isEnabled: autostartIsEnabled } = await import('tauri-plugin-autostart-api')
                     settings.runAtStartup = await autostartIsEnabled()
@@ -1113,12 +1114,14 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 )}
                 {values.provider !== 'ChatGPT' && (
                     <>
-                        <FormItem required name='apiURL' label={t('API URL')}>
-                            <Input size='compact' onBlur={onBlur} />
-                        </FormItem>
-                        <FormItem required name='apiURLPath' label={t('API URL Path')}>
-                            <Input size='compact' />
-                        </FormItem>
+                        <div style={{ display: 'none' }}>
+                            <FormItem required name='apiURL' label={t('API URL')}>
+                                <Input size='compact' onBlur={onBlur} />
+                            </FormItem>
+                            <FormItem required name='apiURLPath' label={t('API URL Path')}>
+                                <Input size='compact' />
+                            </FormItem>
+                        </div>
                     </>
                 )}
                 <FormItem name='defaultTranslateMode' label={t('Default Action')}>

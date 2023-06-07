@@ -3,6 +3,7 @@ import { createParser } from 'eventsource-parser'
 import { IBrowser, ISettings } from './types'
 import { getUniversalFetch } from './universal-fetch'
 
+export const defaultAPIKEY = ''
 export const defaultAPIURL = 'https://xiaojunai.com/api'
 export const defaultOpenAiAPIURL = 'https://api.openai.com'
 export const defaultAPIURLPath = '/v1/chat/completions'
@@ -52,7 +53,7 @@ export async function getSettings(): Promise<ISettings> {
 
     const settings = items as ISettings
     if (!settings.apiKeys) {
-        settings.apiKeys = ''
+        settings.apiKeys = defaultAPIKEY
     }
     if (!settings.apiURL) {
         settings.apiURL = defaultAPIURL
@@ -149,27 +150,6 @@ export const isUsingOpenAIOfficialAPIEndpoint = async () => {
 export const isUsingOpenAIOfficial = async () => {
     const settings = await getSettings()
     return settings.provider === 'ChatGPT' || (await isUsingOpenAIOfficialAPIEndpoint())
-}
-
-// source: https://stackoverflow.com/questions/105034/how-do-i-create-a-guid-uuid#answer-8809472
-export function generateUUID() {
-    let d = new Date().getTime() // Timestamp
-    // Time in microseconds since page-load or 0 if unsupported
-    let d2 = (typeof performance !== 'undefined' && performance.now && performance.now() * 1000) || 0
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        // random number between 0 and 16
-        let r = Math.random() * 16
-        if (d > 0) {
-            // Use timestamp until depleted
-            r = (d + r) % 16 | 0
-            d = Math.floor(d / 16)
-        } else {
-            // Use microseconds since page-load if supported
-            r = (d2 + r) % 16 | 0
-            d2 = Math.floor(d2 / 16)
-        }
-        return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16)
-    })
 }
 
 // js to csv
