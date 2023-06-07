@@ -1,6 +1,6 @@
 {
     "name": "XiaoJun Assistant",
-    "identifier": "xj.futurenav.apps.futurenav-xj-assistant.clip-extensions.snipdo",
+    "identifier": "xj.futurenav.apps.xiaojunassistant.clip-extensions.snipdo",
     "icon": "icon.png",
     "actions": [
         {

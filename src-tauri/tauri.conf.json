@@ -8,7 +8,7 @@
   },
   "package": {
     "productName": "XiaoJun Assistant",
-    "version": "0.1.6"
+    "version": "0.1.7"
   },
   "tauri": {
     "allowlist": {
@@ -64,7 +64,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "xj.futurenav.apps.futurenav-xj-assistant",
+      "identifier": "xj.futurenav.apps.xiaojunassistant",
       "longDescription": "",
       "macOS": {
         "entitlements": null,

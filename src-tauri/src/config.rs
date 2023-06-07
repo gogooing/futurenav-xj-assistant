@@ -33,7 +33,7 @@ pub fn clear_config_cache() {
 #[tauri::command]
 pub fn get_config_content() -> Result<String, String> {
     if let Some(config_dir) = config_dir() {
-        let app_config_dir = config_dir.join("xj.futurenav.apps.futurenav-xj-assistant");
+        let app_config_dir = config_dir.join("xj.futurenav.apps.xiaojunassistant");
         if !app_config_dir.exists() {
             std::fs::create_dir_all(&app_config_dir).unwrap();
         }
