@@ -1609,7 +1609,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                                 ? theme.colors.contentSecondary
                                                                 : theme.colors.contentPrimary,
                                                         fontFamily:
-                                                            currentTranslateMode === 'explain-code'
+                                                            (currentTranslateMode === 'explain-code'||
+                                                            currentTranslateMode === 'xiaojunai' )
                                                                 ? 'monospace'
                                                                 : 'inherit',
                                                         textalign: 'start',
@@ -1846,6 +1847,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                         >
                                             <div>
                                                 {currentTranslateMode === 'explain-code' ||
+                                                currentTranslateMode === 'xiaojunai' ||
                                                 activateAction?.outputRenderingFormat === 'markdown' ? (
                                                     <>
                                                         <Markdown>{translatedText}</Markdown>
