@@ -280,7 +280,7 @@ jobs:
         run: |
           mkdir release
           mv dist/browser-extension/chromium release/futurenav-xj-assistant-chrome-extension-${{ steps.get_version.outputs.version-without-v }}
-          mv dist/futurenav-xj-assistant.user.js release/openai-translator-${{ steps.get_version.outputs.version-without-v }}.user.js
+          mv dist/futurenav-xj-assistant.user.js release/futurenav-xj-assistant-${{ steps.get_version.outputs.version-without-v }}.user.js
           cd release
           zip -r futurenav-xj-assistant-chrome-extension-${{ steps.get_version.outputs.version-without-v }}.zip ./futurenav-xj-assistant-chrome-extension-${{ steps.get_version.outputs.version-without-v }}/*
 

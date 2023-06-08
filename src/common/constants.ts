@@ -8,6 +8,11 @@ export const builtinActionModes: { name: string; mode: Exclude<TranslateMode, 'b
         icon: 'MdOutlineGTranslate',
     },
     {
+        name: 'XiaoJunAI',
+        mode: 'xiaojunai',
+        icon: 'MdFitbit',
+    },
+    {
         name: 'Polishing',
         mode: 'polishing',
         icon: 'MdPalette',

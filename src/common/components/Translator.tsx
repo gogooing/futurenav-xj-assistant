@@ -391,6 +391,10 @@ const actionStrItems: Record<TranslateMode, IActionStrItem> = {
         beforeStr: '正在翻译...',
         afterStr: '翻译完成',
     },
+    'xiaojunai': {
+        beforeStr: '晓君编写...',
+        afterStr: '编写完成',
+    },
     'summarize': {
         beforeStr: '正在总结...',
         afterStr: '总结完成',

@@ -11,15 +11,15 @@ use std::sync::atomic::Ordering;
 
 pub fn menu() -> SystemTray {
     let config = get_config().unwrap();
-    let mut ocr_text = String::from("OCR");
+    let mut ocr_text = String::from("文字识别");
     if let Some(ocr_hotkey) = config.ocr_hotkey {
-        ocr_text = format!("OCR ({})", ocr_hotkey);
+        ocr_text = format!("文字识别 ({})", ocr_hotkey);
     }
     let ocr: CustomMenuItem = CustomMenuItem::new("ocr".to_string(), ocr_text);
-    let show: CustomMenuItem = CustomMenuItem::new("show".to_string(), "Show");
-    let hide = CustomMenuItem::new("hide".to_string(), "Hide");
-    let mut pin: CustomMenuItem = CustomMenuItem::new("pin".to_string(), "Pin");
-    let quit = CustomMenuItem::new("quit".to_string(), "Quit");
+    let show: CustomMenuItem = CustomMenuItem::new("show".to_string(), "显示");
+    let hide = CustomMenuItem::new("hide".to_string(), "隐藏");
+    let mut pin: CustomMenuItem = CustomMenuItem::new("pin".to_string(), "锁定");
+    let quit = CustomMenuItem::new("quit".to_string(), "退出");
     pin.selected = ALWAYS_ON_TOP.load(Ordering::Acquire);
     let tray_menu = SystemTrayMenu::new()
         .add_item(ocr)
