@@ -30,7 +30,7 @@ export class LocalDB extends Dexie {
     action!: Table<Action>
 
     constructor() {
-        super('futurenav-xj-assistant')
+        super('xj-assistant')
         this.version(4).stores({
             vocabulary: 'word, reviewCount, description, updatedAt, createdAt',
             action: '++id, idx, mode, name, icon, rolePrompt, commandPrompt, outputRenderingFormat, updatedAt, createdAt',
