@@ -17,7 +17,7 @@ import { supportedLanguages } from './lang/lang'
 import { useRecordHotkeys } from 'react-hotkeys-hook'
 import { createUseStyles } from 'react-jss'
 import clsx from 'clsx'
-import { ISettings, IThemedStyleProps, ThemeType } from '../types'
+import { ISettings, IThemedStyleProps, ThemeType, ToneType } from '../types'
 import { useTheme } from '../hooks/useTheme'
 import { IoCloseCircle } from 'react-icons/io5'
 import { useTranslation } from 'react-i18next'
@@ -29,6 +29,7 @@ import { IoMdAdd } from 'react-icons/io'
 import { TTSProvider } from '../tts/types'
 import { getEdgeVoices } from '../tts/edge-tts'
 import { useThemeType } from '../hooks/useThemeType'
+import { useToneType } from '../hooks/useToneType'
 import { Slider } from 'baseui-sd/slider'
 import { getUniversalFetch } from '../universal-fetch'
 import { useLiveQuery } from 'dexie-react-hooks'
@@ -522,6 +523,48 @@ function Ii18nSelector({ value, onChange, onBlur }: Ii18nSelectorProps) {
     )
 }
 
+interface IToneTypeSelectorProps {
+    value?: ToneType
+    onChange?: (value: ToneType) => void
+    onBlur?: () => void
+}
+
+function ToneModeSelector({ value, onChange, onBlur }: IToneTypeSelectorProps) {
+    const { t } = useTranslation()
+
+    const options = [
+        { label: t('default'), id: 'default' },
+        { label: t('professional'), id: 'professional' },
+        { label: t('casual'), id: 'casual' },
+        { label: t('straightforward'), id: 'straightforward' },
+        { label: t('confident'), id: 'confident' },
+        { label: t('friendly'), id: 'friendly' },
+        { label: t('naughty'), id: 'naughty' },
+    ]
+
+    return (
+        <Select
+            size='compact'
+            onBlur={onBlur}
+            searchable={false}
+            clearable={false}
+            value={
+                value
+                    ? [
+                        {
+                            id: value,
+                        },
+                    ]
+                    : undefined
+            }
+            onChange={(params) => {
+                onChange?.(params.value[0].id as ToneType)
+            }}
+            options={options}
+        />
+    )
+}
+
 interface APIModelSelectorProps {
     provider: Provider
     value?: string
@@ -944,6 +987,8 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
 
     const { setThemeType } = useThemeType()
 
+    const { setToneType } = useToneType()
+
     const { t } = useTranslation()
 
     const isTauri = utils.isTauri()
@@ -997,6 +1042,9 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
             if (data.themeType) {
                 setThemeType(data.themeType)
             }
+            if(data.tone){
+                setToneType(data.tone)
+            }
             setLoading(true)
             const oldSettings = await utils.getSettings()
             if (isTauri) {
@@ -1026,7 +1074,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
             setSettings(data)
             onSave?.(oldSettings)
         },
-        [isTauri, onSave, setSettings, setThemeType, t]
+        [isTauri, onSave, setSettings, setThemeType, setToneType, t]
     )
 
     const onBlur = useCallback(async () => {
@@ -1181,6 +1229,9 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 </FormItem>
                 <FormItem name='i18n' label={t('i18n')}>
                     <Ii18nSelector onBlur={onBlur} />
+                </FormItem>
+                <FormItem name='tone' label={t('tone')}>
+                    <ToneModeSelector onBlur={onBlur} />
                 </FormItem>
                 <FormItem name='tts' label={t('TTS')}>
                     <TTSVoicesSettings onBlur={onBlur} />

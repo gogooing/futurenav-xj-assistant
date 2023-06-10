@@ -198,6 +198,11 @@ export async function translate(query: TranslateQuery) {
     const assistantPrompts: string[] = []
     let quoteProcessor: QuoteProcessor | undefined
     const settings = await utils.getSettings()
+
+    let tone = ''
+    if (settings.tone && settings.tone !== 'default') {
+        tone = settings.tone
+    }
     let isWordMode = false
 
     if (query.mode === 'big-bang') {
@@ -355,82 +360,99 @@ export async function translate(query: TranslateQuery) {
             case 'xiaojunai':
                 rolePrompt =
                     'Your role as an AI assistant named \"Xiaojun\"(“晓君”) is to use your advanced language processing capabilities to help people answer and solve any questions they may have. Your training by the \"Future Navigation\"(“未来导航”) company means that you are equipped to respond in multiple languages, depending on the language used by the person communicating with you.\nYour response should be accurate, helpful, and concise, providing clear and comprehensive answers to any questions you receive. You should be able to handle a wide range of queries, from simple factual questions to more complex, multi-part inquiries.\nPlease note that as an AI assistant, you are expected to display a high level of professionalism and courtesy in your interactions with users, ensuring that they feel supported and respected. Additionally, your responses should be tailored to the language and communication style of each individual user, taking into account their knowledge level and any cultural differences that may be relevant.'
+                rolePrompt += tone ? 'Respond in ' + tone + ' tone' : ''
                 commandPrompt = ``
                 contentPrompt = '' + query.text + ''
                 break
             case 'polishing':
                 rolePrompt =
-                    'You are an expert translator, please revise the following sentences to make them more clear, concise, and coherent.'
+                    'You are a text polishing and translation expert. Please modify the sentence I provided according to my requirements. Please only provide the polished or translated text and do not include any additional explanations. At the same time, it is necessary to accurately convey the meaning of the original sentence. Additionally, your responses should be tailored to the language and communication style of each individual user, taking into account their knowledge level and any relevant cultural differences.'
                 quoteProcessor = new QuoteProcessor()
-                commandPrompt = `Please polish this text in ${sourceLangName}. Only polish the text between ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.`
+                commandPrompt = tone ?
+                    `Please use the ${tone} tone to polish this text in ${sourceLangName}. Only polish the text between ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.`
+                    : `Please polish this text in ${sourceLangName}. Only polish the text between ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.`
                 contentPrompt = `${quoteProcessor.quoteStart}${query.text}${quoteProcessor.quoteEnd}`
                 break
             case 'summarize':
                 rolePrompt =
-                    "You are a professional text summarizer, you can only summarize the text, don't interpret it."
+                    "You are an expert in text summarization and translation. Please modify the sentence I provided according to my requirements. Please only provide the summarized or translated text and do not include any additional explanations. At the same time, it is necessary to accurately convey the meaning of the original sentence. Additionally, your responses should be tailored to the language and communication style of each individual user, taking into account their knowledge level and any relevant cultural differences."
                 quoteProcessor = new QuoteProcessor()
-                commandPrompt = oneLine`
+                commandPrompt = tone ?
+                    oneLine`
+                Please summarize this text with a ${tone} tone and concise language, 
+                using the ${sourceLangName} language!
+                Only summarize the text between 
+                ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.
+                `
+                    :
+                    oneLine`
                 Please summarize this text in the most concise language
-                and must use ${targetLangName} language!
+                and must use ${sourceLangName} language!
                 Only summarize the text between 
                 ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.
                 `
                 contentPrompt = `${quoteProcessor.quoteStart}${query.text}${quoteProcessor.quoteEnd}`
                 break
             case 'analyze':
-                rolePrompt = 'You are a professional translation engine and grammar analyzer.'
+                rolePrompt = 'You are an expert in text/syntax analysis and translation. Please modify the sentence I provide based on my request. Please only provide text/syntax analysis or translated text, without any additional explanation. Additionally, your response should accurately convey the meaning of the original sentence while being tailored to each user\'s language and communication style, taking into account their level of knowledge and any relevant cultural differences.'
                 quoteProcessor = new QuoteProcessor()
-                commandPrompt = oneLine`
-                Please translate this text to ${targetLangName}
-                and explain the grammar in the original text using ${targetLangName}.
-                Only analyze the text between ${quoteProcessor.quoteStart}
-                and ${quoteProcessor.quoteEnd}.`
+                commandPrompt = tone ? oneLine`Please use a ${tone} tone to analyze this text, explain its grammar and difficult words or phrases, and it must be written in ${sourceLangName}. Only analyze the writing in the text between ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.`
+                    :
+                    oneLine`
+                    Please analyze this text and explain its grammar and difficult phrases. The text must be written in ${sourceLangName}. Only analyze the writing in the text between ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.`
                 contentPrompt = `${quoteProcessor.quoteStart}${query.text}${quoteProcessor.quoteEnd}`
                 break
             case 'improve-writing':
                 rolePrompt =
-                    'I want you to play the role of an editor and help me improve my writing. I hope that you can replace my sentences with more beautiful, elegant, and sophisticated writing techniques while keeping the meaning unchanged but making them more literary. I only expect corrections and improvements from you without any explanations.'
-                commandPrompt = oneLine`
-                Please continue writing this article in the same language as the text: `
-                contentPrompt = '\n\n' + query.text + '\n\n'
+                    'You are an expert in improving writing and translation. Please modify the sentences I provide according to my requirements. Please only provide the text that has been improved in writing or translation, without any other explanation. At the same time, it is necessary to accurately convey the meaning of the original sentence. In addition, your reply should be customized based on each user\'s language and communication style, taking into account their level of knowledge and any relevant cultural differences.'
+                quoteProcessor = new QuoteProcessor()
+                commandPrompt = tone ? oneLine`
+                Please use a ${tone} tone to enhance the writing quality of this paragraph, and it must be written in ${sourceLangName}. Only improve writing the text between 
+                ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.`
+                    : oneLine`Please enhance the writing level of this text, and it must be done in ${sourceLangName} language. Only improve writing the text between 
+                ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.`
+                contentPrompt = `${quoteProcessor.quoteStart}${query.text}${quoteProcessor.quoteEnd}`
                 break
             case 'continue-writing':
                 rolePrompt =
-                    'I want you can play the role of an editor and help me continue writing. I want you can continue writing based on my work, and try to imitate my writing habits and techniques as much as possible. I only expect you to continue writing my work without any explanation needed.'
-                commandPrompt = oneLine`
-                Please continue writing this article in the same language as the text: `
-                contentPrompt = '\n\n' + query.text + '\n\n'
+                    'You are an expert in writing and translation. Please continue the sentence I provide according to my request. Please only provide the continued text and do not provide any other explanations. At the same time, accurately convey the meaning of the original sentence. In addition, your response should be tailored to each user\'s language and communication style, taking into account their level of knowledge and any relevant cultural differences.'
+                quoteProcessor = new QuoteProcessor()
+                commandPrompt = tone ? oneLine`
+                Please continue writing this text in ${tone} tone, and it must be written in ${sourceLangName}. Only continue writing the text between
+                ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.`
+                    : oneLine`Please continue writing this text, and it must be written in ${sourceLangName}. Only continue writing the text between ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.`
+                contentPrompt = `${quoteProcessor.quoteStart}${query.text}${quoteProcessor.quoteEnd}`
                 break
             case 'topic-writing':
                 rolePrompt =
-                    'I want you can play the role of an editor and help me complete my writing. I will give you a topic, and you need to create an excellent article based on this topic. I only expect you to write about my topic without any explanation.'
-                commandPrompt = oneLine`
-                Please use the topic I provided to write an excellent article with no less than 800 words. The content should be professional and written in the same language as the topic I provided. The topic is: `
+                    'You are an expert in writing and translation. Please complete the writing based on the provided topic and requirements. Only provide the text of the writing without any additional explanation. At the same time, accurately convey the meaning of the topic. Additionally, your answer should be tailored to each user\'s language and communication style, taking into account their level of knowledge and any relevant cultural differences.'
+                commandPrompt = tone ? oneLine`
+                Please write an excellent article of no less than 800 words using the topic I provided. Use a ${tone} tone and write it in ${sourceLangName}. The topic is: `
+                    : oneLine`Please write an excellent article of no less than 800 words using the topic I provided. You must use the ${sourceLangName} language. The topic is:`
                 contentPrompt = '\n\n' + query.text + '\n\n'
                 break
             case 'make-longer':
                 rolePrompt =
-                    'I want you can play the role of an editor and help me improve my writing. I want you can assist me in extending my writing without changing the meaning. I only expect you to lengthen my work without any explanations.'
-                commandPrompt = oneLine`
-                Please extend the article without changing its meaning. Please use the same language as the article provided below: `
+                    'You are an expert in writing and translation. Please expand my text according to my requirements. Only provide the expanded text without any additional explanations. Also, accurately convey the original meaning of the text. In addition, your answer should be customized based on each user\'s language and communication style, taking into account their level of knowledge and any relevant cultural differences.'
+                commandPrompt = tone ? oneLine`
+                Please use a ${tone} tone to expand my text, and make sure to use ${sourceLangName} language. My original text is: `
+                    : oneLine`Please expand my text, using ${sourceLangName} language. My original text is: `
                 contentPrompt = '\n\n' + query.text + '\n\n'
                 break
             case 'make-shorter':
                 rolePrompt =
-                    'I want you can play the role of an editor and help me improve my writing. I would like you to assist me in shortening my work without changing its meaning. I only expect you to shorten my work without any explanation.'
-                commandPrompt = oneLine`
-                Please shorten the article without changing its meaning. Please use the same language as the article provided below: `
+                    'You are an expert in writing and translation. Please shorten my text according to my requirements. Only provide the shortened text without any additional explanations. Also, accurately convey the original meaning of the text. In addition, your answer should be customized based on each user\'s language and communication style, taking into account their level of knowledge and any relevant cultural differences.'
+                commandPrompt = tone ? oneLine`
+                Please use a ${tone} tone to shorten my text, and make sure to use ${sourceLangName} language. My original text is: `
+                    : oneLine`Please shorten my text, using ${sourceLangName} language. My original text is: `
                 contentPrompt = '\n\n' + query.text + '\n\n'
                 break
             case 'explain-text':
-                rolePrompt = 'I want you to explain a complex topic to me as if I were 18 years old or younger and had no prior knowledge of the subject.'
-                quoteProcessor = new QuoteProcessor()
-                commandPrompt = oneLine`
-                Please translate this text to ${targetLangName}
-                explain a complex topic using ${targetLangName}.
-                Only explain the text between ${quoteProcessor.quoteStart}
-                and ${quoteProcessor.quoteEnd}.`
-                contentPrompt = `${quoteProcessor.quoteStart}${query.text}${quoteProcessor.quoteEnd}`
+                rolePrompt = 'Your task is to explain complex texts or topics in a clear and concise way to people who are 18 years old or younger and have no prior knowledge of the text or topic. Your answer should avoid using technical or complex terminology and instead rely on simple language and relevant examples to convey the key concepts involved in the text or topic.\nPlease briefly introduce the text or topic and explain its relevance or importance. Then, outline the main ideas or concepts involved in the topic and provide clear and specific examples to help illustrate these ideas. Your response should also emphasize any common misunderstandings or misconceptions that may arise in relation to the text or topic.\nOverall, your answer should be easy to understand and engaging, providing the audience with a solid knowledge foundation they can build upon. Please note that you should avoid oversimplifying the text or omitting important details, as this may lead to confusion or misunderstanding.'
+                commandPrompt = tone ? oneLine`Please explain this topic or text in ${sourceLangName} language using a ${tone} tone. The text or topic is as follows:`
+                : oneLine`
+                Please explain this topic or text in ${sourceLangName} language. The text or topic is as follows:`
+                contentPrompt = '\n\n' + query.text + '\n\n'
                 break
             case 'explain-code':
                 rolePrompt =

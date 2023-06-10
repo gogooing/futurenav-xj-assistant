@@ -51,6 +51,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     ocrHotkey: 1,
     themeType: 1,
     i18n: 1,
+    tone:1,
     tts: 1,
     restorePreviousPosition: 1,
     runAtStartup: 1,
@@ -93,6 +94,9 @@ export async function getSettings(): Promise<ISettings> {
     }
     if (!settings.i18n) {
         settings.i18n = defaulti18n
+    }
+    if (!settings.tone) {
+        settings.tone = 'default'
     }
     if (!settings.disableCollectingStatistics) {
         settings.disableCollectingStatistics = false

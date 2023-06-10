@@ -42,6 +42,13 @@ export interface IThemedStyleProps {
     isDesktopApp?: boolean
 }
 
+export type BaseToneType = 'professional' | 'casual' | 'straightforward' | 'confident' | 'friendly' | 'naughty'
+export type ToneType = BaseToneType | 'default'
+
+export interface IToneStyleProps {
+    toneType: BaseToneType
+}
+
 export interface ISettings {
     apiKeys: string
     apiURL: string
@@ -56,6 +63,7 @@ export interface ISettings {
     ocrHotkey?: string
     themeType?: ThemeType
     i18n?: string
+    tone?:ToneType
     tts?: {
         voices?: {
             lang: string
