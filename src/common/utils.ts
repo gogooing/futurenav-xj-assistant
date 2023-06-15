@@ -8,7 +8,7 @@ export const defaultAPIURL = 'https://xiaojunai.com/api'
 export const defaultOpenAiAPIURL = 'https://api.openai.com'
 export const defaultAPIURLPath = '/v1/chat/completions'
 export const defaultProvider = 'OpenAI'
-export const defaultAPIModel = 'gpt-3.5-turbo'
+export const defaultAPIModel = 'gpt-3.5-turbo-0613'
 
 export const defaultChatGPTAPIAuthSession = 'https://chat.openai.com/api/auth/session'
 export const defaultChatGPTWebAPI = 'https://chat.openai.com/backend-api'
