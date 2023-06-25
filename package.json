@@ -1,6 +1,6 @@
 {
   "name": "futurenav-xj-assistant",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "futurenav-xj-assistant",
   "main": "index.js",
   "scripts": {
