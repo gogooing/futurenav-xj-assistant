@@ -832,9 +832,10 @@ interface IHotkeyRecorderProps {
     value?: string
     onChange?: (value: string) => void
     onBlur?: () => void
+    testId?: string
 }
 
-function HotkeyRecorder({ value, onChange, onBlur }: IHotkeyRecorderProps) {
+function HotkeyRecorder({ value, onChange, onBlur, testId }: IHotkeyRecorderProps) {
     const { theme, themeType } = useTheme()
 
     const { t } = useTranslation()
@@ -902,6 +903,7 @@ function HotkeyRecorder({ value, onChange, onBlur }: IHotkeyRecorderProps) {
                         stop()
                     }
                 }}
+                data-testid={testId}
                 className={clsx(styles.hotkeyRecorder, {
                     [styles.recording]: isRecording,
                 })}
@@ -1155,7 +1157,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                         name='apiKeys'
                         label={t('API Key')}
                     >
-                        <Input autoFocus type='password' size='compact' onBlur={onBlur} />
+                        <Input autoFocus type='password' size='compact' name='apiKey' onBlur={onBlur} />
                     </FormItem>
                 )}
                 {values.provider !== 'Azure' && (
@@ -1239,10 +1241,10 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                     <TTSVoicesSettings onBlur={onBlur} />
                 </FormItem>
                 <FormItem name='hotkey' label={t('Hotkey')}>
-                    <HotkeyRecorder onBlur={onBlur} />
+                    <HotkeyRecorder onBlur={onBlur} testId='hotkey-recorder' />
                 </FormItem>
                 <FormItem name='ocrHotkey' label={t('OCR Hotkey')}>
-                    <HotkeyRecorder onBlur={onBlur} />
+                    <HotkeyRecorder onBlur={onBlur} testId='ocr-hotkey-recorder' />
                 </FormItem>
                 <FormItem
                     style={{
