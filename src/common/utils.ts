@@ -22,18 +22,36 @@ export async function getApiKey(): Promise<string> {
     const settings = await getSettings()
     const apiKeys = (settings.apiKeys ?? '').split(',').map((s) => s.trim())
     const encryptedApiKey = apiKeys[Math.floor(Math.random() * apiKeys.length)] ?? ''
-    const apiKey = await decrypt(encryptedApiKey)
+    const apiKey = decode(encryptedApiKey)
     return apiKey
 }
 
-//自定义的解密方法
-export async function decrypt(str: string): Promise<string> {
-    if (str.startsWith('sk-')) {
-        return str;
+// 自定义的解密方法
+// export async function decrypt(str: string): Promise<string> {
+//     if (str.startsWith('sk-')) {
+//         return str
+//     }
+//     const midIndex = Math.floor(str.length / 2)
+//     const key = str.substring(midIndex) + str.substring(0, midIndex)
+//     return 'sk-' + key
+// }
+// 解密方法
+export function decode(encoded: string) {
+    if (!encoded) {
+        return ''
     }
-    const midIndex = Math.floor(str.length / 2);
-    const key = str.substring(midIndex) + str.substring(0, midIndex);
-    return 'sk-' + key
+    let res = 'sk-'
+    for (let i = 0; i < encoded.length; i++) {
+        const code = encoded.charCodeAt(i)
+        if (code >= 65 && code <= 90) {
+            res += String.fromCharCode(90 - (code - 65))
+        } else if (code >= 97 && code <= 122) {
+            res += String.fromCharCode(122 - (code - 97))
+        } else {
+            res += encoded[i]
+        }
+    }
+    return res
 }
 
 // In order to let the type system remind you that all keys have been passed to browser.storage.sync.get(keys)
@@ -51,7 +69,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     ocrHotkey: 1,
     themeType: 1,
     i18n: 1,
-    tone:1,
+    tone: 1,
     tts: 1,
     restorePreviousPosition: 1,
     runAtStartup: 1,

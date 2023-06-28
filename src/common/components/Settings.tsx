@@ -590,15 +590,19 @@ function APIModelSelector({ provider, value, onChange, onBlur }: APIModelSelecto
         setOptions([])
         if (provider === 'OpenAI') {
             setOptions([
-                { label: 'XiaoJun 3.5', id: 'gpt-3.5-turbo' },
-                { label: 'XiaoJun 3.5 0613', id: 'gpt-3.5-turbo-0613' },
-                { label: 'XiaoJun 3.5 16k', id: 'gpt-3.5-turbo-16k' },
-                { label: 'XiaoJun 3.5 16k 0613', id: 'gpt-3.5-turbo-16k-0613' },
-                { label: 'XiaoJun 4', id: 'gpt-4' },
-                { label: 'XiaoJun 4 0613', id: 'gpt-4-0613' },
-                { label: 'XiaoJun 4 32k', id: 'gpt-4-32k' },
-                { label: 'XiaoJun 4 32k 0613', id: 'gpt-4-32k-0613' },
+                { label: 'XiaoJun 3', id: 'gpt-3.5-turbo-0613' },
+                { label: 'XiaoJun 4', id: 'gpt-4-0613' },
             ])
+            // setOptions([
+            //     { label: 'XiaoJun 3.5', id: 'gpt-3.5-turbo' },
+            //     { label: 'XiaoJun 3', id: 'gpt-3.5-turbo-0613' },
+            //     { label: 'XiaoJun 3.5 16k', id: 'gpt-3.5-turbo-16k' },
+            //     { label: 'XiaoJun 3.5 16k 0613', id: 'gpt-3.5-turbo-16k-0613' },
+            //     { label: 'XiaoJun 4', id: 'gpt-4' },
+            //     { label: 'XiaoJun 4', id: 'gpt-4-0613' },
+            //     { label: 'XiaoJun 4 32k', id: 'gpt-4-32k' },
+            //     { label: 'XiaoJun 4 32k 0613', id: 'gpt-4-32k-0613' },
+            // ])
         } else if (provider === 'ChatGPT') {
             setIsLoading(true)
             try {
@@ -1046,7 +1050,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
             if (data.themeType) {
                 setThemeType(data.themeType)
             }
-            if(data.tone){
+            if (data.tone) {
                 setToneType(data.tone)
             }
             setLoading(true)

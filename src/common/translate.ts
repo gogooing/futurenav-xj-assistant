@@ -12,15 +12,20 @@ import { codeBlock, oneLine, oneLineTrim } from 'common-tags'
 export type TranslateMode = 'translate' | 'xiaojunai' | 'polishing' | 'summarize' | 'analyze' | 'improve-writing' | 'continue-writing' | 'topic-writing' | 'make-longer' | 'make-shorter' | 'explain-text' | 'explain-code' | 'big-bang'
 export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure'
 export type APIModel =
-    | 'gpt-3.5-turbo'
     | 'gpt-3.5-turbo-0613'
-    | 'gpt-3.5-turbo-16k'
-    | 'gpt-3.5-turbo-16k-0613'
-    | 'gpt-4'
     | 'gpt-4-0613'
-    | 'gpt-4-32k'
-    | 'gpt-4-32k-0613'
     | string
+
+// export type APIModel =
+//     | 'gpt-3.5-turbo'
+//     | 'gpt-3.5-turbo-0613'
+//     | 'gpt-3.5-turbo-16k'
+//     | 'gpt-3.5-turbo-16k-0613'
+//     | 'gpt-4'
+//     | 'gpt-4-0613'
+//     | 'gpt-4-32k'
+//     | 'gpt-4-32k-0613'
+//     | string
 
 interface BaseTranslateQuery {
     text: string
