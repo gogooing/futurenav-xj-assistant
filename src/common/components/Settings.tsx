@@ -577,6 +577,25 @@ interface APIModelOption {
     id: string
 }
 
+const openAIModelOptions: APIModelOption[] = [
+    { label: 'XiaoJun 3', id: 'gpt-3.5-turbo-0613' },
+    { label: 'XiaoJun 4', id: 'gpt-4-0613' },
+]
+
+// const openAIModelOptions: APIModelOption[] = [
+//     { label: 'gpt-3.5-turbo', id: 'gpt-3.5-turbo' },
+//     { label: 'gpt-3.5-turbo-0613', id: 'gpt-3.5-turbo-0613' },
+//     { label: 'gpt-3.5-turbo-0301', id: 'gpt-3.5-turbo-0301' },
+//     { label: 'gpt-3.5-turbo-16k', id: 'gpt-3.5-turbo-16k' },
+//     { label: 'gpt-3.5-turbo-16k-0613', id: 'gpt-3.5-turbo-16k-0613' },
+//     { label: 'gpt-4', id: 'gpt-4' },
+//     { label: 'gpt-4-0314', id: 'gpt-4-0314' },
+//     { label: 'gpt-4-0613', id: 'gpt-4-0613' },
+//     { label: 'gpt-4-32k', id: 'gpt-4-32k' },
+//     { label: 'gpt-4-32k-0314', id: 'gpt-4-32k-0314' },
+//     { label: 'gpt-4-32k-0613', id: 'gpt-4-32k-0613' },
+// ]
+
 function APIModelSelector({ provider, value, onChange, onBlur }: APIModelSelectorProps) {
     const fetcher = useMemo(() => getUniversalFetch(), [])
     const { t } = useTranslation()
@@ -589,10 +608,11 @@ function APIModelSelector({ provider, value, onChange, onBlur }: APIModelSelecto
         setErrMsg('')
         setOptions([])
         if (provider === 'OpenAI') {
-            setOptions([
-                { label: 'XiaoJun 3', id: 'gpt-3.5-turbo-0613' },
-                { label: 'XiaoJun 4', id: 'gpt-4-0613' },
-            ])
+            setOptions(openAIModelOptions)
+            // setOptions([
+            //     { label: 'XiaoJun 3', id: 'gpt-3.5-turbo-0613' },
+            //     { label: 'XiaoJun 4', id: 'gpt-4-0613' },
+            // ])
             // setOptions([
             //     { label: 'XiaoJun 3.5', id: 'gpt-3.5-turbo' },
             //     { label: 'XiaoJun 3', id: 'gpt-3.5-turbo-0613' },

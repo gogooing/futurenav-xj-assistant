@@ -2,7 +2,7 @@
     "manifest_version": 3,
 
     "name": "XiaoJun Assistant",
-    "description": "OpenAI-Translator is a Chrome extension that uses the ChatGPT API for translation.",
+    "description": "XiaoJun-Assistant is a Chrome extension that uses the ChatGPT API for translation.",
     "version": "0.1.0",
 
     "icons": {

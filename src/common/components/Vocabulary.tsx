@@ -245,7 +245,7 @@ const Vocabulary = (props: IVocabularyProps) => {
         }
     }
 
-    const onGenerageArticle = async () => {
+    const onGenerateArticle = async () => {
         if (!articleType) {
             toast(t('No article type selected'), {
                 duration: 3000,
@@ -345,15 +345,15 @@ const Vocabulary = (props: IVocabularyProps) => {
                     <>
                         {collectedWordTotal > 0
                             ? words.map((item, index) => (
-                                  <Button
-                                      key={index}
-                                      size='mini'
-                                      kind={selectedWord?.word === item.word ? 'primary' : 'secondary'}
-                                      onClick={() => setSelectedWord(item)}
-                                  >
-                                      {item.word}
-                                  </Button>
-                              ))
+                                <Button
+                                    key={index}
+                                    size='mini'
+                                    kind={selectedWord?.word === item.word ? 'primary' : 'secondary'}
+                                    onClick={() => setSelectedWord(item)}
+                                >
+                                    {item.word}
+                                </Button>
+                            ))
                             : 'no words'}
                     </>
                 )}
@@ -371,7 +371,7 @@ const Vocabulary = (props: IVocabularyProps) => {
                             }}
                         />
                         <StatefulTooltip content='Big Bang' placement='bottom' showArrow>
-                            <div className={styles.actionButton} onClick={onGenerageArticle}>
+                            <div className={styles.actionButton} onClick={onGenerateArticle}>
                                 <Button size='mini' kind={'secondary'}>
                                     <FcIdea size={20} />
                                 </Button>
