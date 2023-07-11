@@ -7,11 +7,11 @@ export const builtinActionModes: { name: string; mode: Exclude<TranslateMode, 'b
         mode: 'translate',
         icon: 'MdOutlineGTranslate',
     },
-    {
-        name: 'XiaoJunAI',
-        mode: 'xiaojunai',
-        icon: 'MdFitbit',
-    },
+    // {
+    //     name: 'XiaoJunAI',
+    //     mode: 'xiaojunai',
+    //     icon: 'MdFitbit',
+    // },
     {
         name: 'Polishing',
         mode: 'polishing',

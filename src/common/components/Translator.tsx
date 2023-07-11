@@ -408,10 +408,10 @@ const actionStrItems: Record<TranslateMode, IActionStrItem> = {
         beforeStr: '正在翻译...',
         afterStr: '翻译完成',
     },
-    'xiaojunai': {
-        beforeStr: '晓君编写...',
-        afterStr: '编写完成',
-    },
+    // 'xiaojunai': {
+    //     beforeStr: '晓君编写...',
+    //     afterStr: '编写完成',
+    // },
     'summarize': {
         beforeStr: '正在总结...',
         afterStr: '总结完成',
@@ -1663,8 +1663,9 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                                 ? theme.colors.contentSecondary
                                                                 : theme.colors.contentPrimary,
                                                         fontFamily:
-                                                            (currentTranslateMode === 'explain-code' ||
-                                                                currentTranslateMode === 'xiaojunai')
+                                                            // (currentTranslateMode === 'explain-code' ||
+                                                            //     currentTranslateMode === 'xiaojunai')
+                                                            (currentTranslateMode === 'explain-code')
                                                                 ? 'monospace'
                                                                 : 'inherit',
                                                         textalign: 'start',
@@ -1716,7 +1717,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 }}
                                             >
                                                 <div className={styles.enterHint}>
-                                                {t('Please press enter')}
+                                                    {t('Please press enter')}
                                                 </div>
                                                 <Button
                                                     size='mini'
@@ -1889,7 +1890,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                         >
                                             <div>
                                                 {currentTranslateMode === 'explain-code' ||
-                                                    currentTranslateMode === 'xiaojunai' ||
+                                                    // currentTranslateMode === 'xiaojunai' ||
                                                     activateAction?.outputRenderingFormat === 'markdown' ? (
                                                     <>
                                                         <Markdown>{translatedText}</Markdown>

@@ -9,7 +9,8 @@ import { getUniversalFetch } from './universal-fetch'
 import { Action } from './internal-services/db'
 import { codeBlock, oneLine, oneLineTrim } from 'common-tags'
 
-export type TranslateMode = 'translate' | 'xiaojunai' | 'polishing' | 'summarize' | 'analyze' | 'improve-writing' | 'continue-writing' | 'topic-writing' | 'make-longer' | 'make-shorter' | 'explain-text' | 'explain-code' | 'big-bang'
+// export type TranslateMode = 'translate' | 'xiaojunai' | 'polishing' | 'summarize' | 'analyze' | 'improve-writing' | 'continue-writing' | 'topic-writing' | 'make-longer' | 'make-shorter' | 'explain-text' | 'explain-code' | 'big-bang'
+export type TranslateMode = 'translate' | 'polishing' | 'summarize' | 'analyze' | 'improve-writing' | 'continue-writing' | 'topic-writing' | 'make-longer' | 'make-shorter' | 'explain-text' | 'explain-code' | 'big-bang'
 export type Provider = 'OpenAI' | 'ChatGPT' | 'Azure'
 export type APIModel =
     | 'gpt-3.5-turbo-0613'
@@ -364,13 +365,13 @@ export async function translate(query: TranslateQuery) {
                     contentPrompt = `the sentence is: ${query.text}\n\nthe word is: ${query.selectedWord}`
                 }
                 break
-            case 'xiaojunai':
-                rolePrompt =
-                    'Your role as an AI assistant named \"Xiaojun\"(“晓君”) is to use your advanced language processing capabilities to help people answer and solve any questions they may have. Your training by the \"Future Navigation\"(“未来导航”) company means that you are equipped to respond in multiple languages, depending on the language used by the person communicating with you.\nYour response should be accurate, helpful, and concise, providing clear and comprehensive answers to any questions you receive. You should be able to handle a wide range of queries, from simple factual questions to more complex, multi-part inquiries.\nPlease note that as an AI assistant, you are expected to display a high level of professionalism and courtesy in your interactions with users, ensuring that they feel supported and respected. Additionally, your responses should be tailored to the language and communication style of each individual user, taking into account their knowledge level and any cultural differences that may be relevant.'
-                rolePrompt += tone ? 'Respond in ' + tone + ' tone' : ''
-                commandPrompt = ``
-                contentPrompt = '' + query.text + ''
-                break
+            // case 'xiaojunai':
+            //     rolePrompt =
+            //         'Your role as an AI assistant named \"Xiaojun\"(“晓君”) is to use your advanced language processing capabilities to help people answer and solve any questions they may have. Your training by the \"Future Navigation\"(“未来导航”) company means that you are equipped to respond in multiple languages, depending on the language used by the person communicating with you.\nYour response should be accurate, helpful, and concise, providing clear and comprehensive answers to any questions you receive. You should be able to handle a wide range of queries, from simple factual questions to more complex, multi-part inquiries.\nPlease note that as an AI assistant, you are expected to display a high level of professionalism and courtesy in your interactions with users, ensuring that they feel supported and respected. Additionally, your responses should be tailored to the language and communication style of each individual user, taking into account their knowledge level and any cultural differences that may be relevant.'
+            //     rolePrompt += tone ? 'Respond in ' + tone + ' tone' : ''
+            //     commandPrompt = ``
+            //     contentPrompt = '' + query.text + ''
+            //     break
             case 'polishing':
                 rolePrompt =
                     'You are a text polishing and translation expert. Please modify the sentence I provided according to my requirements. Please only provide the polished or translated text and do not include any additional explanations. At the same time, it is necessary to accurately convey the meaning of the original sentence. Additionally, your responses should be tailored to the language and communication style of each individual user, taking into account their knowledge level and any relevant cultural differences.'
