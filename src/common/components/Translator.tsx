@@ -12,30 +12,29 @@ import { TbArrowsExchange, TbCsv } from 'react-icons/tb'
 import { MdOutlineGrade, MdGrade } from 'react-icons/md'
 import * as mdIcons from 'react-icons/md'
 import { StatefulTooltip } from 'baseui-sd/tooltip'
-import { detectLang, getLangConfig, sourceLanguages, targetLanguages, LangCode } from './lang/lang'
+import { detectLang, getLangConfig, sourceLanguages, targetLanguages, LangCode } from '../lang'
 import { translate, TranslateMode } from '../translate'
 import { Select, Value, Option } from 'baseui-sd/select'
 import { RxEraser, RxReload, RxSpeakerLoud } from 'react-icons/rx'
-import { calculateMaxXY, queryPopupCardElement } from '../../browser-extension/content_script/utils'
+import { LuStars, LuStarOff } from 'react-icons/lu'
 import { clsx } from 'clsx'
 import { Button } from 'baseui-sd/button'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback } from '../components/ErrorFallback'
-import { defaultAPIURL, exportToCsv, isDesktopApp, isTauri, isUserscript } from '../utils'
+import { defaultAPIURL, exportToCsv, isDesktopApp, isTauri, getAssetUrl, isUserscript, setSettings } from '../utils'
 import { InnerSettings } from './Settings'
-import { documentPadding } from '../../browser-extension/content_script/consts'
+import { containerID, popupCardInnerContainerId } from '../../browser-extension/content_script/consts'
 import Dropzone from 'react-dropzone'
 import { RecognizeResult, createWorker } from 'tesseract.js'
 import { BsTextareaT } from 'react-icons/bs'
 import { FcIdea } from 'react-icons/fc'
-import icon from '../assets/images/icon.png'
 import rocket from '../assets/images/rocket.gif'
 import partyPopper from '../assets/images/party-popper.gif'
 import type { Event } from '@tauri-apps/api/event'
 import SpeakerMotion from '../components/SpeakerMotion'
 import IpLocationNotification from '../components/IpLocationNotification'
 import { HighlightInTextarea } from '../highlight-in-textarea'
-import LRUCache from 'lru-cache'
+import { LRUCache } from 'lru-cache'
 import { ISettings, IThemedStyleProps } from '../types'
 import { useTheme } from '../hooks/useTheme'
 import { speak } from '../tts'
@@ -63,9 +62,9 @@ import { Markdown } from './Markdown'
 import useResizeObserver from 'use-resize-observer'
 import _ from 'underscore'
 import { GlobalSuspense } from './GlobalSuspense'
-import { getPageX, getPageY, UserEventType } from '../user-event'
 import { countTokens } from '../token'
 import { useLazyEffect } from '../usehooks'
+import LogoWithText, { type LogoWithTextRef } from './LogoWithText'
 
 const cache = new LRUCache({
     max: 500,
@@ -98,82 +97,61 @@ const useStyles = createUseStyles({
     'footer': (props: IThemedStyleProps) =>
         props.isDesktopApp
             ? {
-                color: props.theme.colors.contentSecondary,
-                position: 'fixed',
-                width: '100%',
-                height: '42px',
-                cursor: 'pointer',
-                left: '0',
-                bottom: '0',
-                paddingLeft: '16px',
-                display: 'flex',
-                alignItems: 'center',
-                background: props.themeType === 'dark' ? 'rgba(31, 31, 31, 0.5)' : 'rgba(255, 255, 255, 0.5)',
-                backdropFilter: 'blur(10px)',
-            }
+                  color: props.theme.colors.contentSecondary,
+                  position: 'fixed',
+                  width: '100%',
+                  height: '42px',
+                  cursor: 'pointer',
+                  left: '0',
+                  bottom: '0',
+                  paddingLeft: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  background: props.themeType === 'dark' ? 'rgba(31, 31, 31, 0.5)' : 'rgba(255, 255, 255, 0.5)',
+                  backdropFilter: 'blur(10px)',
+              }
             : {
-                color: props.theme.colors.contentSecondary,
-                position: 'absolute',
-                cursor: 'pointer',
-                bottom: '16px',
-                left: '16px',
-                lineHeight: '1',
-            },
+                  color: props.theme.colors.contentSecondary,
+                  position: 'absolute',
+                  cursor: 'pointer',
+                  bottom: '16px',
+                  left: '16px',
+                  lineHeight: '1',
+              },
     'popupCardHeaderContainer': (props: IThemedStyleProps) =>
         props.isDesktopApp
             ? {
-                'position': 'fixed',
-                'backdropFilter': 'blur(10px)',
-                'zIndex': 1,
-                'left': 0,
-                'top': 0,
-                'width': '100%',
-                'boxSizing': 'border-box',
-                'padding': '30px 16px 8px',
-                'background': props.themeType === 'dark' ? 'rgba(31, 31, 31, 0.5)' : 'rgba(255, 255, 255, 0.5)',
-                'display': 'flex',
-                'flexDirection': 'row',
-                'flexFlow': 'row nowrap',
-                'cursor': 'move',
-                'alignItems': 'center',
-                'borderBottom': `1px solid ${props.theme.colors.borderTransparent}`,
-                '-ms-user-select': 'none',
-                '-webkit-user-select': 'none',
-                'user-select': 'none',
-            }
+                  'position': 'fixed',
+                  'backdropFilter': 'blur(10px)',
+                  'zIndex': 1,
+                  'left': 0,
+                  'top': 0,
+                  'width': '100%',
+                  'boxSizing': 'border-box',
+                  'padding': '30px 16px 8px',
+                  'background': props.themeType === 'dark' ? 'rgba(31, 31, 31, 0.5)' : 'rgba(255, 255, 255, 0.5)',
+                  'display': 'flex',
+                  'flexDirection': 'row',
+                  'flexFlow': 'row nowrap',
+                  'cursor': 'move',
+                  'alignItems': 'center',
+                  'borderBottom': `1px solid ${props.theme.colors.borderTransparent}`,
+                  '-ms-user-select': 'none',
+                  '-webkit-user-select': 'none',
+                  'user-select': 'none',
+              }
             : {
-                'display': 'flex',
-                'flexDirection': 'row',
-                'cursor': 'move',
-                'alignItems': 'center',
-                'padding': '8px 16px',
-                'borderBottom': `1px solid ${props.theme.colors.borderTransparent}`,
-                'minWidth': '580px',
-                '-ms-user-select': 'none',
-                '-webkit-user-select': 'none',
-                'user-select': 'none',
-            },
-    'iconContainer': {
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        flexShrink: 0,
-        marginRight: 'auto',
-    },
-    'icon': {
-        'display': 'block',
-        'width': '16px',
-        'height': '16px',
-        '-ms-user-select': 'none',
-        '-webkit-user-select': 'none',
-        'user-select': 'none',
-    },
-    'iconText': (props: IThemedStyleProps) => ({
-        color: props.themeType === 'dark' ? props.theme.colors.contentSecondary : props.theme.colors.contentPrimary,
-        fontSize: '12px',
-        fontWeight: 600,
-        cursor: 'unset',
-    }),
+                  'display': 'flex',
+                  'flexDirection': 'row',
+                  'cursor': 'move',
+                  'alignItems': 'center',
+                  'padding': '8px 16px',
+                  'borderBottom': `1px solid ${props.theme.colors.borderTransparent}`,
+                  'minWidth': '612px',
+                  '-ms-user-select': 'none',
+                  '-webkit-user-select': 'none',
+                  'user-select': 'none',
+              },
     'paragraph': {
         'margin': '0.5em 0',
         '-ms-user-select': 'text',
@@ -210,7 +188,7 @@ const useStyles = createUseStyles({
         'flexShrink': 0,
         'flexDirection': 'row',
         'alignItems': 'center',
-        'padding': '5px 10px',
+        'padding': props.showLogo ? '5px 10px' : '5px 10px 5px 0px',
         'gap': '10px',
         '@media screen and (max-width: 460px)': {
             padding: props.isDesktopApp ? '5px 0' : undefined,
@@ -293,11 +271,16 @@ const useStyles = createUseStyles({
         },
     },
     'popupCardTranslatedContentContainer': (props: IThemedStyleProps) => ({
-        fontSize: '15px',
-        marginTop: '-14px',
-        display: 'flex',
-        overflowY: 'auto',
-        color: props.themeType === 'dark' ? props.theme.colors.contentSecondary : props.theme.colors.contentPrimary,
+        'fontSize': '15px',
+        'marginTop': '-14px',
+        'display': 'flex',
+        'overflowY': 'auto',
+        'color': props.themeType === 'dark' ? props.theme.colors.contentSecondary : props.theme.colors.contentPrimary,
+        '& *': {
+            '-ms-user-select': 'text',
+            '-webkit-user-select': 'text',
+            'user-select': 'text',
+        },
     }),
     'errorMessage': {
         display: 'flex',
@@ -467,6 +450,7 @@ export interface IInnerTranslatorProps {
     defaultShowSettings?: boolean
     containerStyle?: React.CSSProperties
     editorRows?: number
+    showLogo?: boolean
     onSettingsSave?: (oldSettings: ISettings) => void
 }
 
@@ -496,6 +480,9 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     useEffect(() => {
         setupAnalysis()
     }, [])
+    const [showSettings, setShowSettings] = useState(false)
+
+    const { showLogo = true } = props
 
     const [refreshActionsFlag, refreshActions] = useReducer((x: number) => x + 1, 0)
 
@@ -515,7 +502,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if (settings?.i18n !== (i18n as any).language) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ; (i18n as any).changeLanguage(settings?.i18n)
+            ;(i18n as any).changeLanguage(settings?.i18n)
         }
     }, [i18n, settings?.i18n])
 
@@ -587,11 +574,9 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     }, [settings?.defaultTranslateMode])
 
     const headerRef = useRef<HTMLDivElement>(null)
-    const { width: headerWidth = 0, height: headerHeight = 0 } = useResizeObserver<HTMLDivElement>({ ref: headerRef })
+    const { width: headerWidth = 0 } = useResizeObserver<HTMLDivElement>({ ref: headerRef })
 
-    const iconContainerRef = useRef<HTMLDivElement>(null)
-
-    const logoTextRef = useRef<HTMLDivElement>(null)
+    const logoWithTextRef = useRef<LogoWithTextRef>(null)
 
     const languagesSelectorRef = useRef<HTMLDivElement>(null)
 
@@ -601,13 +586,13 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const { width: headerActionButtonsWidth = 0 } = useResizeObserver<HTMLDivElement>({ ref: headerActionButtonsRef })
 
+    const containerRef = useRef<HTMLDivElement>(null)
     const editorContainerRef = useRef<HTMLDivElement>(null)
+    const translatedContainerRef = useRef<HTMLDivElement>(null)
 
     const translatedContentRef = useRef<HTMLDivElement>(null)
 
     const actionButtonsRef = useRef<HTMLDivElement>(null)
-
-    const scrollYRef = useRef<number>(0)
 
     const hasActivateAction = activateAction !== undefined
     const [displayedActionsMaxCount, setDisplayedActionsMaxCount] = useState(4)
@@ -618,16 +603,13 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             if (!headerElem) {
                 return
             }
-            const logoTextElem = logoTextRef.current
-            if (!logoTextElem) {
-                return
-            }
+            const logoWithTextElem = logoWithTextRef.current
             const activateActionElem = headerElem.querySelector('.__yetone-activate-action')
             if (hasActivateAction && !activateActionElem) {
                 return
             }
             const paddingWidth = 32
-            const logoWidth = 131
+            const logoWidth = showLogo ? 131 : 0
             const iconWidth = 32
             const iconWithTextWidth = activateActionElem ? activateActionElem.clientWidth : 105
             const iconGap = 5
@@ -638,13 +620,13 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                     languagesSelectorWidth -
                     10 -
                     iconWithTextWidth * (hasActivateAction ? 1 : 0)) /
-                (iconGap + iconWidth)
+                    (iconGap + iconWidth)
             )
             count = hasActivateAction ? count + 1 : count
             if (count <= 0) {
-                logoTextElem.style.display = 'none'
+                logoWithTextElem?.hideText()
             } else {
-                logoTextElem.style.display = 'flex'
+                logoWithTextElem?.showText()
             }
             setDisplayedActionsMaxCount(Math.min(Math.max(count, 1), 7))
         }
@@ -654,7 +636,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         return () => {
             clearTimeout(timer)
         }
-    }, [hasActivateAction, headerWidth, languagesSelectorWidth, headerActionButtonsWidth])
+    }, [hasActivateAction, headerWidth, languagesSelectorWidth, headerActionButtonsWidth, showLogo])
 
     const actions = useLiveQuery(() => actionService.list(), [refreshActionsFlag])
 
@@ -729,7 +711,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const { theme, themeType } = useTheme()
 
-    const styles = useStyles({ theme, themeType, isDesktopApp: isDesktopApp() })
+    const styles = useStyles({ theme, themeType, isDesktopApp: isDesktopApp(), showLogo })
     const [isLoading, setIsLoading] = useState(false)
     const [editableText, setEditableText] = useState(props.text)
     const [isSpeakingEditableText, setIsSpeakingEditableText] = useState(false)
@@ -740,6 +722,9 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     const [translatedLines, setTranslatedLines] = useState<string[]>([])
     const [isWordMode, setIsWordMode] = useState(false)
     const [isCollectedWord, setIsCollectedWord] = useState(false)
+    const [isAutoCollectOn, setIsAutoCollectOn] = useState(
+        settings?.autoCollect === undefined ? false : settings.autoCollect
+    )
 
     useEffect(() => {
         setOriginalText(props.text)
@@ -775,12 +760,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     }, [editableText])
 
     useEffect(() => {
-        if (isWordMode && !isLoading) {
-            checkWordCollection()
-        }
-    }, [isWordMode, isLoading, checkWordCollection])
-
-    useEffect(() => {
         setTranslatedLines(translatedText.split('\n'))
     }, [translatedText])
     const [isSpeakingTranslatedText, setIsSpeakingTranslatedText] = useState(false)
@@ -802,7 +781,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             return
         }
 
-        ; (async () => {
+        ;(async () => {
             const sourceLang_ = await detectLang(originalText)
             setSourceLang(sourceLang_)
             setTargetLang((targetLang_) => {
@@ -837,170 +816,98 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const { collectedWordTotal, setCollectedWordTotal } = useCollectedWordTotal()
 
-    // Reposition the popup card to prevent it from extending beyond the screen.
     useEffect(() => {
-        const calculateTranslatedContentMaxHeight = (): number => {
-            const { innerHeight } = window
-            const editorHeight = editorContainerRef.current?.offsetHeight || 0
-            const actionButtonsHeight = actionButtonsRef.current?.offsetHeight || 0
-            return innerHeight - headerHeight - editorHeight - actionButtonsHeight - documentPadding * 10
+        const popupCardInnerContainer: HTMLDivElement | null | undefined = document
+            .querySelector(`#${containerID}`)
+            ?.shadowRoot?.querySelector(`#${popupCardInnerContainerId}`)
+
+        if (!popupCardInnerContainer) {
+            return
         }
 
-        const resizeHandle: ResizeObserverCallback = _.debounce((entries) => {
-            // Listen for element height changes
-            for (const entry of entries) {
-                const $popupCard = entry.target as HTMLElement
-                const [maxX, maxY] = calculateMaxXY($popupCard)
-                const yList = [maxY, $popupCard.offsetTop].filter((item) => item > documentPadding)
-                $popupCard.style.top = `${Math.min(...yList) || documentPadding}px`
-                const xList = [maxX, $popupCard.offsetLeft].filter((item) => item > documentPadding)
-                $popupCard.style.left = `${Math.min(...xList) || documentPadding}px`
+        const calculateTranslatedContentMaxHeight = (): number => {
+            const { innerHeight } = window
+            const maxHeight = popupCardInnerContainer ? parseInt(popupCardInnerContainer.style.maxHeight) : innerHeight
 
-                const $translatedContent = translatedContentRef.current
-                if ($translatedContent) {
-                    const translatedContentMaxHeight = calculateTranslatedContentMaxHeight()
-                    $translatedContent.style.maxHeight = `${translatedContentMaxHeight}px`
-                }
+            const editorHeight = editorContainerRef.current?.offsetHeight || 0
+            const actionButtonsHeight = actionButtonsRef.current?.offsetHeight || 0
+            const headerHeight = headerRef.current?.offsetHeight || 0
+            const { paddingTop, paddingBottom } = getComputedStyle(translatedContainerRef.current as HTMLDivElement)
+            const { paddingTop: containerPaddingTop, paddingBottom: containerPaddingBottom } = getComputedStyle(
+                containerRef.current as HTMLDivElement
+            )
+            const paddingVertical =
+                parseInt(paddingTop) +
+                parseInt(paddingBottom) +
+                parseInt(containerPaddingTop) +
+                parseInt(containerPaddingBottom)
+
+            return maxHeight - headerHeight - editorHeight - actionButtonsHeight - paddingVertical
+        }
+
+        const resizeHandle: ResizeObserverCallback = _.debounce(() => {
+            // Listen for element height changes
+            const $translatedContent = translatedContentRef.current
+            if ($translatedContent) {
+                const translatedContentMaxHeight = calculateTranslatedContentMaxHeight()
+                $translatedContent.style.maxHeight = `${translatedContentMaxHeight}px`
             }
         }, 500)
 
         const observer = new ResizeObserver(resizeHandle)
-        queryPopupCardElement().then(($popupCard) => {
-            if ($popupCard) {
-                const rect = $popupCard.getBoundingClientRect()
-                const x = Math.min(window.innerWidth - 600, rect.x)
-                $popupCard.style.left = x + 'px'
-                observer.observe($popupCard)
-            }
-        })
+        observer.observe(popupCardInnerContainer)
         return () => {
-            queryPopupCardElement().then(($popupCard) => $popupCard && observer.unobserve($popupCard))
+            observer.disconnect()
         }
-    }, [headerHeight])
-
-    useEffect(() => {
-        if (isDesktopApp()) {
-            return
-        }
-        const $header = headerRef.current
-        if (!$header) {
-            return undefined
-        }
-
-        let $popupCard: HTMLDivElement | null = null
-            ; (async () => {
-                $popupCard = await queryPopupCardElement()
-                if (!$popupCard) {
-                    return
-                }
-            })()
-
-        let closed = true
-        let lastPageX = 0
-        let lastPageY = 0
-
-        const dragMouseDown = (e: UserEventType) => {
-            closed = false
-            e = e || window.event
-            e.preventDefault()
-            $popupCard?.addEventListener('mouseup', closeDragElement)
-            document.addEventListener('mousemove', elementDrag)
-            document.addEventListener('mouseup', closeDragElement)
-
-            lastPageX = getPageX(e)
-            lastPageY = getPageY(e)
-            $popupCard?.addEventListener('touchend', closeDragElement)
-            document.addEventListener('touchmove', elementDrag)
-            document.addEventListener('touchend', closeDragElement)
-        }
-
-        const elementDrag = async (e: UserEventType) => {
-            e.stopPropagation()
-            if (closed || !$popupCard) {
-                return
-            }
-            e = e || window.event
-            e.preventDefault()
-
-            let movement: MovementXY
-            if (e instanceof MouseEvent) {
-                movement = { x: e.movementX, y: e.movementY }
-            } else {
-                const [pageX, pageY] = [getPageX(e), getPageY(e)]
-                movement = { x: pageX - lastPageX, y: pageY - lastPageY }
-                lastPageX = pageX
-                lastPageY = pageY
-            }
-            const [l, t] = overflowCheck($popupCard, movement)
-            $popupCard.style.top = `${t}px`
-            $popupCard.style.left = `${l}px`
-        }
-
-        const overflowCheck = ($popupCard: HTMLDivElement, movementXY: MovementXY): number[] => {
-            let { offsetTop: cardTop, offsetLeft: cardLeft } = $popupCard
-            const rect = $popupCard.getBoundingClientRect()
-            const { x: movementX, y: movementY } = movementXY
-            if (
-                rect.left + movementX > documentPadding &&
-                rect.right + movementX < document.documentElement.clientWidth - documentPadding
-            ) {
-                cardLeft = $popupCard.offsetLeft + movementX
-            }
-            if (
-                rect.top + movementY > documentPadding &&
-                rect.bottom + movementY < document.documentElement.clientHeight - documentPadding
-            ) {
-                cardTop = $popupCard.offsetTop + movementY
-            }
-            return [cardLeft, cardTop]
-        }
-
-        const elementScroll = async (e: globalThis.Event) => {
-            e.stopPropagation()
-            if (closed || !$popupCard) {
-                scrollYRef.current = window.scrollY
-                return
-            }
-            e = e || window.event
-            e.preventDefault()
-            const { scrollY } = window
-            const movementY = scrollY - scrollYRef.current
-            const [l, t] = overflowCheck($popupCard, { x: 0, y: movementY })
-            $popupCard.style.top = `${t}px`
-            $popupCard.style.left = `${l}px`
-            scrollYRef.current = scrollY
-        }
-
-        const closeDragElement = () => {
-            closed = true
-            $popupCard?.removeEventListener('mouseup', closeDragElement)
-            document.removeEventListener('mousemove', elementDrag)
-            document.removeEventListener('mouseup', closeDragElement)
-
-            $popupCard?.removeEventListener('touchend', closeDragElement)
-            document.removeEventListener('touchmove', elementDrag)
-            document.removeEventListener('touchend', closeDragElement)
-        }
-
-        $header.addEventListener('mousedown', dragMouseDown)
-        $header.addEventListener('mouseup', closeDragElement)
-        document.addEventListener('scroll', elementScroll)
-
-        const $iconContainer = iconContainerRef.current
-        $iconContainer?.addEventListener('touchstart', dragMouseDown)
-        $iconContainer?.addEventListener('touchend', closeDragElement)
-
-        return () => {
-            $header.removeEventListener('mousedown', dragMouseDown)
-            $header.removeEventListener('mouseup', closeDragElement)
-            document.removeEventListener('scroll', elementScroll)
-            $iconContainer?.removeEventListener('touchstart', dragMouseDown)
-            $iconContainer?.removeEventListener('touchend', closeDragElement)
-            closeDragElement()
-        }
-    }, [headerRef])
+    }, [showSettings])
 
     const [isNotLogin, setIsNotLogin] = useState(false)
+
+    /**
+     * Add or remove word from collection.
+     * @param remove - Remove word from collection if true, otherwise add it to collection.
+     */
+    const onWordCollection = useCallback(
+        async (remove: boolean) => {
+            try {
+                if (remove) {
+                    const wordInfo = await vocabularyService.getItem(editableText.trim())
+                    await vocabularyService.deleteItem(wordInfo?.word ?? '')
+                    setCollectedWordTotal((t: number) => t - 1)
+                    setIsCollectedWord(false)
+                } else {
+                    await vocabularyService.putItem({
+                        word: editableText,
+                        reviewCount: 1,
+                        description: translatedText.slice(editableText.length + 1), // separate string after first '\n'
+                        updatedAt: new Date().valueOf().toString(),
+                        createdAt: new Date().valueOf().toString(),
+                    })
+                    setCollectedWordTotal((t: number) => t + 1)
+                    setIsCollectedWord(true)
+                }
+            } catch (e) {
+                console.error(e)
+            }
+        },
+        [editableText, setCollectedWordTotal, translatedText]
+    )
+
+    useEffect(() => {
+        setSettings({ autoCollect: isAutoCollectOn })
+    }, [isAutoCollectOn])
+
+    const autoCollect = useCallback(async () => {
+        await checkWordCollection()
+        if (isWordMode && isAutoCollectOn) {
+            onWordCollection(false)
+            console.info(`Auto collecting word: ${editableText}`)
+        }
+    }, [isWordMode, isAutoCollectOn, editableText, onWordCollection, checkWordCollection])
+    const autoCollectRef = useRef(autoCollect)
+    useEffect(() => {
+        autoCollectRef.current = autoCollect
+    }, [autoCollect])
 
     const translateText = useCallback(
         async (text: string, selectedWord: string, signal: AbortSignal) => {
@@ -1015,9 +922,9 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             const actionStrItem = currentTranslateMode
                 ? actionStrItems[currentTranslateMode]
                 : {
-                    beforeStr: 'Processing...',
-                    afterStr: 'Processed',
-                }
+                      beforeStr: 'Processing...',
+                      afterStr: 'Processed',
+                  }
             const beforeTranslate = () => {
                 let actionStr = actionStrItem.beforeStr
                 if (currentTranslateMode === 'translate' && sourceLang === targetLang) {
@@ -1048,12 +955,15 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                         actionStr = 'Polished'
                     }
                     setActionStr(actionStr)
+                    autoCollectRef.current()
                 }
             }
             beforeTranslate()
-            const cachedKey = `translate:${settings?.provider ?? ''}:${settings?.apiModel ?? ''}:${action.id}:${action.rolePrompt
-                }:${action.commandPrompt}:${action.outputRenderingFormat
-                }:${sourceLang}:${targetLang}:${text}:${selectedWord}:${translationFlag}`
+            const cachedKey = `translate:${settings?.provider ?? ''}:${settings?.apiModel ?? ''}:${action.id}:${
+                action.rolePrompt
+            }:${action.commandPrompt}:${
+                action.outputRenderingFormat
+            }:${sourceLang}:${targetLang}:${text}:${selectedWord}:${translationFlag}`
             const cachedValue = cache.get(cachedKey)
             if (cachedValue) {
                 afterTranslate('stop')
@@ -1120,7 +1030,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             currentTranslateMode,
             settings?.provider,
             settings?.apiModel,
-            settings?.tone,
             translationFlag,
             startLoading,
             stopLoading,
@@ -1140,7 +1049,6 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
     }, [translateText, editableText, detectedOriginalText, selectedWord])
 
-    const [showSettings, setShowSettings] = useState(false)
     useEffect(() => {
         if (!props.defaultShowSettings) {
             return
@@ -1174,7 +1082,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         if (!isTauri()) {
             return
         }
-        ; (async () => {
+        ;(async () => {
             const { listen } = await import('@tauri-apps/api/event')
             const { fs } = await import('@tauri-apps/api')
             listen('tauri://file-drop', async (e: Event<string>) => {
@@ -1259,35 +1167,12 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         await (await worker).terminate()
     }
 
-    const onWordCollection = async () => {
-        try {
-            if (isCollectedWord) {
-                const wordInfo = await vocabularyService.getItem(editableText.trim())
-                await vocabularyService.deleteItem(wordInfo?.word ?? '')
-                setIsCollectedWord(false)
-                setCollectedWordTotal((t: number) => t - 1)
-            } else {
-                await vocabularyService.putItem({
-                    word: editableText,
-                    reviewCount: 1,
-                    description: translatedText.slice(editableText.length + 1), // separate string after first '\n'
-                    updatedAt: new Date().valueOf().toString(),
-                    createdAt: new Date().valueOf().toString(),
-                })
-                setIsCollectedWord(true)
-                setCollectedWordTotal((t: number) => t + 1)
-            }
-        } catch (e) {
-            console.error(e)
-        }
-    }
-
     const onCsvExport = async () => {
         try {
             const words = await vocabularyService.listItems()
             await exportToCsv<VocabularyItem>(`future-xiaojun-assistant-collection-${new Date().valueOf()}`, words)
             if (isDesktopApp()) {
-                toast(t('csv file saved on Desktop'), {
+                toast(t('CSV file saved on Desktop'), {
                     duration: 5000,
                     icon: '👏',
                 })
@@ -1342,6 +1227,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
             className={clsx(styles.popupCard, {
                 'yetone-dark': themeType === 'dark',
             })}
+            ref={containerRef}
             style={{
                 minHeight: vocabularyType !== 'hide' ? '600px' : undefined,
                 background: theme.colors.backgroundPrimary,
@@ -1371,15 +1257,10 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                         className={styles.popupCardHeaderContainer}
                         data-tauri-drag-region
                         style={{
-                            cursor: isDesktopApp() ? 'default' : 'move',
+                            cursor: isDesktopApp() ? 'default' : showLogo ? 'move' : 'default',
                         }}
                     >
-                        <div data-tauri-drag-region className={styles.iconContainer} ref={iconContainerRef}>
-                            <img data-tauri-drag-region className={styles.icon} src={icon} />
-                            <div data-tauri-drag-region className={styles.iconText} ref={logoTextRef}>
-                                {t('APP Name')}
-                            </div>
-                        </div>
+                        {showLogo && <LogoWithText ref={logoWithTextRef} />}
                         <div className={styles.popupCardHeaderActionsContainer} ref={languagesSelectorRef}>
                             <div className={styles.from}>
                                 <Select
@@ -1492,56 +1373,82 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                 )
                             })}
                         </div>
-                        <div className={styles.popupCardHeaderMoreActionsContainer}>
-                            <StatefulPopover
-                                autoFocus={false}
-                                triggerType='hover'
-                                showArrow
-                                placement='bottom'
-                                content={
-                                    <StatefulMenu
-                                        initialState={{
-                                            highlightedIndex: hiddenActions.findIndex(
-                                                (action) => action.id === activateAction?.id
-                                            ),
-                                        }}
-                                        onItemSelect={async ({ item }) => {
-                                            const actionID = item.id
-                                            if (actionID === '__manager__') {
-                                                if (isTauri()) {
-                                                    const { invoke } = await import('@tauri-apps/api')
-                                                    if (!navigator.userAgent.includes('Windows')) {
-                                                        await invoke('show_action_manager_window')
-                                                    } else {
-                                                        const { LogicalSize, WebviewWindow } = await import(
-                                                            '@tauri-apps/api/window'
-                                                        )
-                                                        const windowLabel = 'action_manager'
-                                                        let window = WebviewWindow.getByLabel(windowLabel)
-                                                        if (!window) {
-                                                            window = new WebviewWindow(windowLabel, {
-                                                                url: 'src/tauri/action_manager.html',
-                                                                decorations: false,
-                                                                visible: true,
-                                                                focus: true,
-                                                            })
+                        {props.showSettings && (
+                            <div className={styles.popupCardHeaderMoreActionsContainer}>
+                                <StatefulPopover
+                                    autoFocus={false}
+                                    triggerType='hover'
+                                    showArrow
+                                    placement='bottom'
+                                    content={
+                                        <StatefulMenu
+                                            initialState={{
+                                                highlightedIndex: hiddenActions.findIndex(
+                                                    (action) => action.id === activateAction?.id
+                                                ),
+                                            }}
+                                            onItemSelect={async ({ item }) => {
+                                                const actionID = item.id
+                                                if (actionID === '__manager__') {
+                                                    if (isTauri()) {
+                                                        const { invoke } = await import('@tauri-apps/api')
+                                                        if (!navigator.userAgent.includes('Windows')) {
+                                                            await invoke('show_action_manager_window')
+                                                        } else {
+                                                            const { LogicalSize, WebviewWindow } = await import(
+                                                                '@tauri-apps/api/window'
+                                                            )
+                                                            const windowLabel = 'action_manager'
+                                                            let window = WebviewWindow.getByLabel(windowLabel)
+                                                            if (!window) {
+                                                                window = new WebviewWindow(windowLabel, {
+                                                                    url: 'src/tauri/action_manager.html',
+                                                                    decorations: false,
+                                                                    visible: true,
+                                                                    focus: true,
+                                                                })
+                                                            }
+                                                            await window.setDecorations(false)
+                                                            await window.setSize(new LogicalSize(600, 770))
+                                                            await window.center()
+                                                            await window.show()
                                                         }
-                                                        await window.setDecorations(false)
-                                                        await window.setSize(new LogicalSize(600, 770))
-                                                        await window.center()
-                                                        await window.show()
+                                                    } else {
+                                                        setShowActionManager(true)
                                                     }
-                                                } else {
-                                                    setShowActionManager(true)
+                                                    return
                                                 }
-                                                return
-                                            }
-                                            setActivateAction(actions?.find((a) => a.id === (actionID as number)))
-                                        }}
-                                        items={[
-                                            ...hiddenActions.map((action) => {
-                                                return {
-                                                    id: action.id,
+                                                setActivateAction(actions?.find((a) => a.id === (actionID as number)))
+                                            }}
+                                            items={[
+                                                ...hiddenActions.map((action) => {
+                                                    return {
+                                                        id: action.id,
+                                                        label: (
+                                                            <div
+                                                                style={{
+                                                                    display: 'flex',
+                                                                    flexDirection: 'row',
+                                                                    alignItems: 'center',
+                                                                    gap: 6,
+                                                                }}
+                                                            >
+                                                                {action.icon
+                                                                    ? React.createElement(
+                                                                          (mdIcons as Record<string, IconType>)[
+                                                                              action.icon
+                                                                          ],
+                                                                          { size: 15 }
+                                                                      )
+                                                                    : undefined}
+                                                                {action.mode ? t(action.name) : action.name}
+                                                            </div>
+                                                        ),
+                                                    }
+                                                }),
+                                                { divider: true },
+                                                {
+                                                    id: '__manager__',
                                                     label: (
                                                         <div
                                                             style={{
@@ -1549,48 +1456,24 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                                 flexDirection: 'row',
                                                                 alignItems: 'center',
                                                                 gap: 6,
+                                                                fontWeight: 500,
                                                             }}
                                                         >
-                                                            {action.icon
-                                                                ? React.createElement(
-                                                                    (mdIcons as Record<string, IconType>)[
-                                                                    action.icon
-                                                                    ],
-                                                                    { size: 15 }
-                                                                )
-                                                                : undefined}
-                                                            {action.mode ? t(action.name) : action.name}
+                                                            <GiPlatform />
+                                                            {t('Action Manager')}
                                                         </div>
                                                     ),
-                                                }
-                                            }),
-                                            { divider: true },
-                                            {
-                                                id: '__manager__',
-                                                label: (
-                                                    <div
-                                                        style={{
-                                                            display: 'flex',
-                                                            flexDirection: 'row',
-                                                            alignItems: 'center',
-                                                            gap: 6,
-                                                            fontWeight: 500,
-                                                        }}
-                                                    >
-                                                        <GiPlatform />
-                                                        {t('Action Manager')}
-                                                    </div>
-                                                ),
-                                            },
-                                        ]}
-                                    />
-                                }
-                            >
-                                <div className={styles.popupCardHeaderMoreActionsBtn}>
-                                    <GrMoreVertical />
-                                </div>
-                            </StatefulPopover>
-                        </div>
+                                                },
+                                            ]}
+                                        />
+                                    }
+                                >
+                                    <div className={styles.popupCardHeaderMoreActionsBtn}>
+                                        <GrMoreVertical />
+                                    </div>
+                                </StatefulPopover>
+                            </div>
+                        )}
                     </div>
                     <div className={styles.popupCardContentContainer}>
                         {settings?.apiURL === defaultAPIURL && (
@@ -1638,7 +1521,14 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 </div>
                                                 {showOCRProcessing && (
                                                     <div>
-                                                        <img src={isOCRProcessing ? rocket : partyPopper} width='20' />
+                                                        <img
+                                                            src={
+                                                                isOCRProcessing
+                                                                    ? getAssetUrl(rocket)
+                                                                    : getAssetUrl(partyPopper)
+                                                            }
+                                                            width='20'
+                                                        />{' '}
                                                     </div>
                                                 )}
                                             </div>
@@ -1649,23 +1539,23 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                             overrides={{
                                                 Root: {
                                                     style: {
-                                                        fontSize: '15px',
+                                                        fontSize: '15px !important',
                                                         width: '100%',
                                                         borderRadius: '0px',
                                                     },
                                                 },
                                                 Input: {
                                                     style: {
-                                                        fontSize: '15px',
+                                                        fontSize: '15px !important',
                                                         padding: '4px 8px',
                                                         color:
                                                             themeType === 'dark'
                                                                 ? theme.colors.contentSecondary
                                                                 : theme.colors.contentPrimary,
                                                         fontFamily:
-                                                            // (currentTranslateMode === 'explain-code' ||
+                                                        // (currentTranslateMode === 'explain-code' ||
                                                             //     currentTranslateMode === 'xiaojunai')
-                                                            (currentTranslateMode === 'explain-code')
+                                                            currentTranslateMode === 'explain-code'
                                                                 ? 'monospace'
                                                                 : 'inherit',
                                                         textalign: 'start',
@@ -1717,7 +1607,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 }}
                                             >
                                                 <div className={styles.enterHint}>
-                                                    {t('Please press enter')}
+                                                    {'Press <Enter> to submit, <Shift+Enter> for a new line.'}
                                                 </div>
                                                 <Button
                                                     size='mini'
@@ -1851,7 +1741,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                             </div>
                         </div>
                         {detectedOriginalText !== '' && (
-                            <div className={styles.popupCardTranslatedContainer} dir={translatedLanguageDirection}>
+                            <div
+                                className={styles.popupCardTranslatedContainer}
+                                ref={translatedContainerRef}
+                                dir={translatedLanguageDirection}
+                            >
                                 {actionStr && (
                                     <div
                                         className={clsx({
@@ -1890,8 +1784,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                         >
                                             <div>
                                                 {currentTranslateMode === 'explain-code' ||
-                                                    // currentTranslateMode === 'xiaojunai' ||
-                                                    activateAction?.outputRenderingFormat === 'markdown' ? (
+                                                // currentTranslateMode === 'xiaojunai' ||
+                                                activateAction?.outputRenderingFormat === 'markdown' ? (
                                                     <>
                                                         <Markdown>{translatedText}</Markdown>
                                                         {isLoading && <span className={styles.caret} />}
@@ -1904,7 +1798,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                 ) : (
                                                     translatedLines.map((line, i) => {
                                                         return (
-                                                            <p className={styles.paragraph} key={`p-${i}`}>
+                                                            <div className={styles.paragraph} key={`p-${i}`}>
                                                                 {isWordMode && i === 0 ? (
                                                                     <div
                                                                         style={{
@@ -1926,7 +1820,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                                             >
                                                                                 <div
                                                                                     className={styles.actionButton}
-                                                                                    onClick={onWordCollection}
+                                                                                    onClick={() =>
+                                                                                        onWordCollection(
+                                                                                            isCollectedWord
+                                                                                        )
+                                                                                    }
                                                                                 >
                                                                                     {isCollectedWord ? (
                                                                                         <MdGrade size={15} />
@@ -1943,7 +1841,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                                 {isLoading && i === translatedLines.length - 1 && (
                                                                     <span className={styles.caret} />
                                                                 )}
-                                                            </p>
+                                                            </div>
                                                         )
                                                     })
                                                 )}
@@ -1967,13 +1865,34 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                         className={styles.actionButton}
                                                         onClick={handleTranslatedSpeakAction}
                                                     >
-                                                        {isSpeakingTranslatedText ? (
-                                                            <SpeakerMotion />
-                                                        ) : (
-                                                            <RxSpeakerLoud size={15} />
-                                                        )}
+                                                        <div
+                                                            onClick={() => forceTranslate()}
+                                                            className={styles.actionButton}
+                                                        >
+                                                            {isSpeakingTranslatedText ? (
+                                                                <SpeakerMotion />
+                                                            ) : (
+                                                                <RxSpeakerLoud size={15} />
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </Tooltip>
+                                                {isWordMode && (
+                                                    <Tooltip content={t('Auto collect')} placement='bottom'>
+                                                        <div
+                                                            className={styles.actionButton}
+                                                            onClick={() => {
+                                                                setIsAutoCollectOn((prevState) => !prevState)
+                                                            }}
+                                                        >
+                                                            {isAutoCollectOn ? (
+                                                                <LuStars size={15} />
+                                                            ) : (
+                                                                <LuStarOff size={15} />
+                                                            )}
+                                                        </div>
+                                                    </Tooltip>
+                                                )}
                                                 <Tooltip content={t('Copy to clipboard')} placement='bottom'>
                                                     <div className={styles.actionButton}>
                                                         <CopyButton text={translatedText} styles={styles}></CopyButton>

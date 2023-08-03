@@ -40,6 +40,7 @@ export interface IThemedStyleProps {
     theme: Theme
     themeType: BaseThemeType
     isDesktopApp?: boolean
+    showLogo?: boolean
 }
 
 export type BaseToneType = 'professional' | 'casual' | 'straightforward' | 'confident' | 'friendly' | 'naughty'
@@ -63,7 +64,7 @@ export interface ISettings {
     ocrHotkey?: string
     themeType?: ThemeType
     i18n?: string
-    tone?:ToneType
+    tone?: ToneType
     tts?: {
         voices?: {
             lang: string
@@ -78,4 +79,6 @@ export interface ISettings {
     runAtStartup?: boolean
     disableCollectingStatistics?: boolean
     allowUsingClipboardWhenSelectedTextNotAvailable?: boolean
+    pinned?: boolean
+    autoCollect?: boolean
 }

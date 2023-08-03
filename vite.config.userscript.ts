@@ -15,17 +15,17 @@ export default defineConfig({
             entry: 'src/browser-extension/content_script/index.tsx',
             userscript: {
                 name,
-                icon: 'https://github.com/gogooing/futurenav-xj-assistant/blob/main/public/icon.png',
-                namespace: 'https://github.com/gogooing/futurenav-xj-assistant',
+                icon: 'https://cdn.jsdelivr.net/gh/openai-translator/openai-translator/public/icon.png',
+                namespace: 'https://github.com/openai-translator/openai-translator',
                 match: ['*://*/*'],
-                author: 'https://github.com/gogooing',
+                author: 'https://github.com/openai-translator',
                 license,
                 description: {
                     '': '基于 ChatGPT API 的划词翻译浏览器插件和跨平台桌面端应用',
                     'en': 'Browser extension and cross-platform desktop application for translation based on ChatGPT API',
                 },
                 require: [
-                    'https://github.com/gogooing/futurenav-xj-assistant/tree/main/public/cld-min.js',
+                    'https://cdn.jsdelivr.net/gh/openai-translator/openai-translator/public/cld-min.js',
                     'data:application/javascript,%3Bwindow.detectLanguage%3DdetectLanguage%3B',
                 ],
                 version,

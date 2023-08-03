@@ -656,8 +656,13 @@ function APIModelSelector({ provider, value, onChange, onBlur }: APIModelSelecto
                     if (!models) {
                         return
                     }
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    setOptions(models.map((model: any) => ({ label: model.title, id: model.slug })))
+                    setOptions(
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        models.map((model: any) => ({
+                            label: `${model.title} (${model.tags.join(', ')})`,
+                            id: model.slug,
+                        }))
+                    )
                 })()
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (e: any) {
