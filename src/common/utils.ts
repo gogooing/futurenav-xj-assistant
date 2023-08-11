@@ -275,5 +275,8 @@ export async function fetchSSE(input: string, options: FetchSSEOptions) {
 }
 
 export function getAssetUrl(asset: string) {
+    if (isUserscript()) {
+        return asset
+    }
     return new URL(asset, import.meta.url).href
 }

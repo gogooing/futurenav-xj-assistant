@@ -15,7 +15,7 @@ import { StatefulTooltip } from 'baseui-sd/tooltip'
 import { detectLang, getLangConfig, sourceLanguages, targetLanguages, LangCode } from '../lang'
 import { translate, TranslateMode } from '../translate'
 import { Select, Value, Option } from 'baseui-sd/select'
-import { RxEraser, RxReload, RxSpeakerLoud } from 'react-icons/rx'
+import { RxEraser, RxReload, RxSpeakerLoud, RxStop } from 'react-icons/rx'
 import { LuStars, LuStarOff } from 'react-icons/lu'
 import { clsx } from 'clsx'
 import { Button } from 'baseui-sd/button'
@@ -65,6 +65,7 @@ import { GlobalSuspense } from './GlobalSuspense'
 import { countTokens } from '../token'
 import { useLazyEffect } from '../usehooks'
 import LogoWithText, { type LogoWithTextRef } from './LogoWithText'
+import { useTranslatorStore, setEditableText, setOriginalText, setDetectedOriginalText } from '../store'
 
 const cache = new LRUCache({
     max: 500,
@@ -713,10 +714,8 @@ function InnerTranslator(props: IInnerTranslatorProps) {
 
     const styles = useStyles({ theme, themeType, isDesktopApp: isDesktopApp(), showLogo })
     const [isLoading, setIsLoading] = useState(false)
-    const [editableText, setEditableText] = useState(props.text)
+    const { editableText, originalText, detectedOriginalText } = useTranslatorStore()
     const [isSpeakingEditableText, setIsSpeakingEditableText] = useState(false)
-    const [originalText, setOriginalText] = useState(props.text)
-    const [detectedOriginalText, setDetectedOriginalText] = useState(props.text)
     const [tokenCount, setTokenCount] = useState(0)
     const [translatedText, setTranslatedText] = useState('')
     const [translatedLines, setTranslatedLines] = useState<string[]>([])
@@ -1037,15 +1036,16 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         ]
     )
 
+    const translateControllerRef = useRef<AbortController | null>(null)
     useEffect(() => {
         if (editableText !== detectedOriginalText) {
             return
         }
-        const controller = new AbortController()
-        const { signal } = controller
+        translateControllerRef.current = new AbortController()
+        const { signal } = translateControllerRef.current
         translateText(detectedOriginalText, selectedWord, signal)
         return () => {
-            controller.abort()
+            translateControllerRef.current?.abort()
         }
     }, [translateText, editableText, detectedOriginalText, selectedWord])
 
@@ -1221,6 +1221,12 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     }
 
     const enableVocabulary = !isUserscript()
+
+    const handleStopGenerating = () => {
+        translateControllerRef.current?.abort('stop')
+        stopLoading()
+        setActionStr('Stopped')
+    }
 
     return (
         <div
@@ -1571,6 +1577,9 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                     : Math.min(Math.max(editableText.split('\n').length, 3), 12)
                                             }
                                             onChange={(e) => setEditableText(e.target.value)}
+                                            onKeyDown={(e) => {
+                                                e.stopPropagation()
+                                            }}
                                             onKeyPress={(e) => {
                                                 if (e.key === 'Enter' && !e.shiftKey) {
                                                     e.preventDefault()
@@ -1709,6 +1718,13 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                 <div style={{ marginLeft: 'auto' }}></div>
                                 {!!editableText.length && (
                                     <>
+                                        {isLoading && (
+                                            <Tooltip content={t('Stop')} placement='bottom'>
+                                                <div className={styles.actionButton} onClick={handleStopGenerating}>
+                                                    <RxStop size={15} />
+                                                </div>
+                                            </Tooltip>
+                                        )}
                                         <Tooltip content={t('Speak')} placement='bottom'>
                                             <div className={styles.actionButton} onClick={handleEditSpeakAction}>
                                                 {isSpeakingEditableText ? (
@@ -1758,8 +1774,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                             <span className={styles.writing} key={'1'} />
                                         ) : errorMessage ? (
                                             <span key={'2'}>😢</span>
+                                        ) : translateControllerRef.current?.signal.aborted &&
+                                          translateControllerRef.current?.signal.reason === 'stop' ? (
+                                            <span key={'3'}>⏹️</span>
                                         ) : (
-                                            <span key={'3'}>👍</span>
+                                            <span key={'4'}>👍</span>
                                         )}
                                     </div>
                                 )}
@@ -1865,16 +1884,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                                                         className={styles.actionButton}
                                                         onClick={handleTranslatedSpeakAction}
                                                     >
-                                                        <div
-                                                            onClick={() => forceTranslate()}
-                                                            className={styles.actionButton}
-                                                        >
-                                                            {isSpeakingTranslatedText ? (
-                                                                <SpeakerMotion />
-                                                            ) : (
-                                                                <RxSpeakerLoud size={15} />
-                                                            )}
-                                                        </div>
+                                                        {isSpeakingTranslatedText ? (
+                                                            <SpeakerMotion />
+                                                        ) : (
+                                                            <RxSpeakerLoud size={15} />
+                                                        )}
                                                     </div>
                                                 </Tooltip>
                                                 {isWordMode && (
