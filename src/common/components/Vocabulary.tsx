@@ -271,7 +271,7 @@ const Vocabulary = (props: IVocabularyProps) => {
                 text: str,
                 articlePrompt: prompt || '',
                 onMessage: (message) => {
-                    if (message.role) {
+                    if (!message.content) {
                         return
                     }
                     setArticle((e) => {
@@ -345,15 +345,15 @@ const Vocabulary = (props: IVocabularyProps) => {
                     <>
                         {collectedWordTotal > 0
                             ? words.map((item, index) => (
-                                <Button
-                                    key={index}
-                                    size='mini'
-                                    kind={selectedWord?.word === item.word ? 'primary' : 'secondary'}
-                                    onClick={() => setSelectedWord(item)}
-                                >
-                                    {item.word}
-                                </Button>
-                            ))
+                                  <Button
+                                      key={index}
+                                      size='mini'
+                                      kind={selectedWord?.word === item.word ? 'primary' : 'secondary'}
+                                      onClick={() => setSelectedWord(item)}
+                                  >
+                                      {item.word}
+                                  </Button>
+                              ))
                             : 'no words'}
                     </>
                 )}

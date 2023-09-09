@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import _ from 'underscore'
 import icon from '../assets/images/icon-large.png'
 import beams from '../assets/images/beams.jpg'
+import wechat from '../assets/images/wechat.png'
+import alipay from '../assets/images/alipay.png'
 import toast, { Toaster } from 'react-hot-toast'
 import * as utils from '../utils'
 import { Client as Styletron } from 'styletron-engine-atomic'
@@ -13,11 +15,11 @@ import { Button } from 'baseui-sd/button'
 import { TranslateMode, Provider, APIModel } from '../translate'
 import { Select, Value, Option } from 'baseui-sd/select'
 import { Checkbox } from 'baseui-sd/checkbox'
-import { supportedLanguages } from './lang/lang'
+import { supportedLanguages } from '../lang'
 import { useRecordHotkeys } from 'react-hotkeys-hook'
 import { createUseStyles } from 'react-jss'
 import clsx from 'clsx'
-import { ISettings, IThemedStyleProps, ThemeType, ToneType } from '../types'
+import { ISettings, IThemedStyleProps, ThemeType,ToneType } from '../types'
 import { useTheme } from '../hooks/useTheme'
 import { IoCloseCircle } from 'react-icons/io5'
 import { useTranslation } from 'react-i18next'
@@ -35,6 +37,7 @@ import { getUniversalFetch } from '../universal-fetch'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { actionService } from '../services/action'
 import { GlobalSuspense } from './GlobalSuspense'
+import { Modal, ModalBody, ModalHeader } from 'baseui-sd/modal'
 
 const langOptions: Value = supportedLanguages.reduce((acc, [id, label]) => {
     return [
@@ -50,6 +53,13 @@ interface ILanguageSelectorProps {
     value?: string
     onChange?: (value: string) => void
     onBlur?: () => void
+}
+
+const linkStyle = {
+    color: 'inherit',
+    opacity: 0.8,
+    cursor: 'pointer',
+    outline: 'none',
 }
 
 function LanguageSelector({ value, onChange, onBlur }: ILanguageSelectorProps) {
@@ -158,10 +168,10 @@ function ThemeTypeSelector({ value, onChange, onBlur }: IThemeTypeSelectorProps)
             value={
                 value
                     ? [
-                        {
-                            id: value,
-                        },
-                    ]
+                          {
+                              id: value,
+                          },
+                      ]
                     : []
             }
             onChange={(params) => {
@@ -214,9 +224,9 @@ const ttsProviderOptions: {
     label: string
     id: TTSProvider
 }[] = [
-        { label: 'XiaoJun TTS', id: 'EdgeTTS' },
-        { label: 'System Default', id: 'WebSpeech' },
-    ]
+    { label: 'XiaoJun TTS', id: 'EdgeTTS' },
+    { label: 'System Default', id: 'WebSpeech' },
+]
 
 function TTSVoicesSettings({ value, onChange, onBlur }: TTSVoicesSettingsProps) {
     const { t } = useTranslation()
@@ -229,7 +239,7 @@ function TTSVoicesSettings({ value, onChange, onBlur }: TTSVoicesSettingsProps) 
     const [supportVoices, setSupportVoices] = useState<SpeechSynthesisVoice[]>([])
 
     useEffect(() => {
-        ; (async () => {
+        ;(async () => {
             switch (value?.provider ?? defaultTTSProvider) {
                 case 'EdgeTTS':
                     setSupportVoices(await getEdgeVoices())
@@ -464,13 +474,12 @@ function TTSVoicesSettings({ value, onChange, onBlur }: TTSVoicesSettingsProps) 
                     )}
                     <Button
                         size='mini'
-                        startEnhancer={() => <IoMdAdd size={15} />}
+                        startEnhancer={() => <IoMdAdd size={12} />}
                         onClick={(e) => {
                             e.preventDefault()
                             e.stopPropagation()
                             setShowLangSelector(true)
                         }}
-                        style={{ width: '80px' }}
                     >
                         {t('Add')}
                     </Button>
@@ -506,17 +515,17 @@ function Ii18nSelector({ value, onChange, onBlur }: Ii18nSelectorProps) {
             value={
                 value
                     ? [
-                        {
-                            id: value,
-                            label: options.find((option) => option.id === value)?.label || 'zh-Hans',
-                        },
-                    ]
+                          {
+                              id: value,
+                              label: options.find((option) => option.id === value)?.label || 'en',
+                          },
+                      ]
                     : undefined
             }
             onChange={(params) => {
                 onChange?.(params.value[0].id as string)
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    ; (i18n as any).changeLanguage(params.value[0].id as string)
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                ;(i18n as any).changeLanguage(params.value[0].id as string)
             }}
             options={options}
         />
@@ -609,24 +618,10 @@ function APIModelSelector({ provider, value, onChange, onBlur }: APIModelSelecto
         setOptions([])
         if (provider === 'OpenAI') {
             setOptions(openAIModelOptions)
-            // setOptions([
-            //     { label: 'XiaoJun 3', id: 'gpt-3.5-turbo-0613' },
-            //     { label: 'XiaoJun 4', id: 'gpt-4-0613' },
-            // ])
-            // setOptions([
-            //     { label: 'XiaoJun 3.5', id: 'gpt-3.5-turbo' },
-            //     { label: 'XiaoJun 3', id: 'gpt-3.5-turbo-0613' },
-            //     { label: 'XiaoJun 3.5 16k', id: 'gpt-3.5-turbo-16k' },
-            //     { label: 'XiaoJun 3.5 16k 0613', id: 'gpt-3.5-turbo-16k-0613' },
-            //     { label: 'XiaoJun 4', id: 'gpt-4' },
-            //     { label: 'XiaoJun 4', id: 'gpt-4-0613' },
-            //     { label: 'XiaoJun 4 32k', id: 'gpt-4-32k' },
-            //     { label: 'XiaoJun 4 32k 0613', id: 'gpt-4-32k-0613' },
-            // ])
         } else if (provider === 'ChatGPT') {
             setIsLoading(true)
             try {
-                ; (async () => {
+                ;(async () => {
                     const sessionResp = await fetcher(utils.defaultChatGPTAPIAuthSession, { cache: 'no-cache' })
                     if (sessionResp.status !== 200) {
                         setIsChatGPTNotLogin(true)
@@ -684,10 +679,10 @@ function APIModelSelector({ provider, value, onChange, onBlur }: APIModelSelecto
                 value={
                     value
                         ? [
-                            {
-                                id: value,
-                            },
-                        ]
+                              {
+                                  id: value,
+                              },
+                          ]
                         : undefined
                 }
                 onChange={(params) => {
@@ -714,7 +709,7 @@ function APIModelSelector({ provider, value, onChange, onBlur }: APIModelSelecto
                 {isChatGPTNotLogin && (
                     <div>
                         <span>{t('Please login to ChatGPT Web')}: </span>
-                        <a href='https://chat.openai.com' target='_blank' rel='noreferrer'>
+                        <a href='https://chat.openai.com' target='_blank' rel='noreferrer' style={linkStyle}>
                             Login
                         </a>
                     </div>
@@ -888,7 +883,7 @@ function HotkeyRecorder({ value, onChange, onBlur, testId }: IHotkeyRecorderProp
     useEffect(() => {
         let keys_ = Array.from(keys)
         if (keys_ && keys_.length > 0) {
-            keys_ = keys_.filter((k) => k.toLowerCase() !== 'meta')
+            keys_ = keys_.map((k) => (k.toLowerCase() === 'meta' ? 'CommandOrControl' : k))
             setHotKeys(keys_)
             onChange?.(keys_.join('+'))
         }
@@ -958,19 +953,19 @@ function HotkeyRecorder({ value, onChange, onBlur, testId }: IHotkeyRecorderProp
 function ProviderSelector({ value, onChange }: IProviderSelectorProps) {
     const options = utils.isDesktopApp()
         ? ([
-            { label: 'XiaoJun', id: 'OpenAI' },
-        ] as {
-            label: string
-            id: Provider
-        }[])
+              { label: 'XiaoJun', id: 'OpenAI' },
+          ] as {
+              label: string
+              id: Provider
+          }[])
         : ([
-            { label: 'XiaoJun', id: 'OpenAI' },
-            { label: 'ChatGPT (Web)', id: 'ChatGPT' },
-            { label: 'Azure', id: 'Azure' },
-        ] as {
-            label: string
-            id: Provider
-        }[])
+              { label: 'XiaoJun', id: 'OpenAI' },
+              { label: 'ChatGPT (Web)', id: 'ChatGPT' },
+              { label: 'Azure', id: 'Azure' },
+          ] as {
+              label: string
+              id: Provider
+          }[])
 
     return (
         <Select
@@ -1042,6 +1037,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
         restorePreviousPosition: false,
         selectInputElementsText: utils.defaultSelectInputElementsText,
         runAtStartup: false,
+        writingTargetLanguage: utils.defaultWritingTargetLanguage,
     })
     const [prevValues, setPrevValues] = useState<ISettings>(values)
 
@@ -1055,7 +1051,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
 
     useEffect(() => {
         if (settings) {
-            ; (async () => {
+            ;(async () => {
                 if (isTauri) {
                     const { isEnabled: autostartIsEnabled } = await import('tauri-plugin-autostart-api')
                     settings.runAtStartup = await autostartIsEnabled()
@@ -1107,7 +1103,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
             setSettings(data)
             onSave?.(oldSettings)
         },
-        [isTauri, onSave, setSettings, setThemeType, setToneType, t]
+        [isTauri, onSave, setSettings, setThemeType,setToneType, t]
     )
 
     const onBlur = useCallback(async () => {
@@ -1119,6 +1115,8 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
 
     const isDesktopApp = utils.isDesktopApp()
     const isMacOS = navigator.userAgent.includes('Mac OS X')
+
+    const [showBuyMeACoffee, setShowBuyMeACoffee] = useState(false)
 
     return (
         <div
@@ -1144,26 +1142,28 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                     alignItems: 'center',
                     padding: '15px 25px',
                     color: '#333',
-                    background: `url(${beams}) no-repeat center center`,
+                    background: `url(${utils.getAssetUrl(beams)}) no-repeat center center`,
                     gap: 10,
                     boxSizing: 'border-box',
                 }}
                 data-tauri-drag-region
             >
-                <img width='22' src={icon} alt='logo' />
-                <h2>
+                <img width='22' src={utils.getAssetUrl(icon)} alt='logo' />
+                <h2
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 6,
+                    }}
+                >
                     {t('APP Name')}
                     {AppConfig?.version ? (
                         <a
-                            href='https://xiaojunai.com'
+                        href='https://xiaojunai.com'
                             target='_blank'
                             rel='noreferrer'
-                            style={{
-                                fontSize: '0.65em',
-                                marginLeft: '5px',
-                                color: 'unset',
-                                textDecoration: 'none',
-                            }}
+                            style={linkStyle}
                         >
                             {AppConfig.version}
                         </a>
@@ -1179,7 +1179,7 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 initialValues={values}
                 onValuesChange={onChange}
             >
-                <FormItem name='provider' label={t('Default Service Provider')} required>
+                <FormItem name='provider' label={t('Default service provider')} required>
                     <ProviderSelector />
                 </FormItem>
                 {values.provider !== 'ChatGPT' && (
@@ -1198,14 +1198,12 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 )}
                 {values.provider !== 'ChatGPT' && (
                     <>
-                        <div style={{ display: 'none' }}>
-                            <FormItem required name='apiURL' label={t('API URL')}>
-                                <Input size='compact' onBlur={onBlur} />
-                            </FormItem>
-                            <FormItem required name='apiURLPath' label={t('API URL Path')}>
-                                <Input size='compact' />
-                            </FormItem>
-                        </div>
+                        <FormItem required name='apiURL' label={t('API URL')}>
+                            <Input size='compact' onBlur={onBlur} />
+                        </FormItem>
+                        <FormItem required name='apiURLPath' label={t('API URL Path')}>
+                            <Input size='compact' />
+                        </FormItem>
                     </>
                 )}
                 <FormItem name='defaultTranslateMode' label={t('Default Action')}>
@@ -1248,15 +1246,15 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 <FormItem name='restorePreviousPosition' label={t('Restore Previous Position')}>
                     <RestorePreviousPositionCheckbox onBlur={onBlur} />
                 </FormItem>
-                <FormItem name='selectInputElementsText' label={t('Select Input Elements Text')}>
+                <FormItem name='selectInputElementsText' label={t('Word selection in input')}>
                     <SelectInputElementsCheckbox onBlur={onBlur} />
                 </FormItem>
                 {isTauri && (
-                    <FormItem name='runAtStartup' label={t('Run at Startup')}>
+                    <FormItem name='runAtStartup' label={t('Run at startup')}>
                         <RunAtStartupCheckbox onBlur={onBlur} />
                     </FormItem>
                 )}
-                <FormItem name='defaultTargetLanguage' label={t('Default Target Language')}>
+                <FormItem name='defaultTargetLanguage' label={t('Default target language')}>
                     <LanguageSelector onBlur={onBlur} />
                 </FormItem>
                 <FormItem name='themeType' label={t('Theme')}>
@@ -1276,6 +1274,37 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 </FormItem>
                 <FormItem name='ocrHotkey' label={t('OCR Hotkey')}>
                     <HotkeyRecorder onBlur={onBlur} testId='ocr-hotkey-recorder' />
+                </FormItem>
+                <FormItem
+                    style={{
+                        display: isDesktopApp ? 'block' : 'none',
+                    }}
+                    name='writingTargetLanguage'
+                    label={t('Writing target language')}
+                >
+                    <LanguageSelector onBlur={onBlur} />
+                </FormItem>
+                <FormItem
+                    style={{
+                        display: isDesktopApp ? 'block' : 'none',
+                    }}
+                    name='writingHotkey'
+                    label={t('Writing Hotkey')}
+                    caption={t(
+                        'Press this shortcut key in the input box of any application, and the text already entered in the input box will be automatically translated into the writing target language.'
+                    )}
+                >
+                    <HotkeyRecorder onBlur={onBlur} testId='writing-hotkey-recorder' />
+                </FormItem>
+                <FormItem
+                    style={{
+                        display: isDesktopApp ? 'block' : 'none',
+                    }}
+                    name='writingNewlineHotkey'
+                    label={t('Writing line break shortcut')}
+                    caption={t('When writing, which key should be pressed when encountering a line break?')}
+                >
+                    <HotkeyRecorder onBlur={onBlur} testId='writing-newline-hotkey-recorder' />
                 </FormItem>
                 <FormItem
                     style={{
@@ -1305,6 +1334,42 @@ export function InnerSettings({ onSave }: IInnerSettingsProps) {
                 </div>
                 <Toaster />
             </Form>
+            <Modal
+                isOpen={showBuyMeACoffee}
+                onClose={() => setShowBuyMeACoffee(false)}
+                closeable
+                size='auto'
+                autoFocus
+                animate
+            >
+                <ModalHeader
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                    }}
+                >
+                    {'❤️  ' + t('Buy me a coffee')}
+                </ModalHeader>
+                <ModalBody>
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: 10,
+                        }}
+                    >
+                        <div>{t('If you find this tool helpful, you can buy me a cup of coffee.')}</div>
+                        <div>
+                            <img width='330' src={wechat} />
+                        </div>
+                        <div>
+                            <img width='330' src={alipay} />
+                        </div>
+                    </div>
+                </ModalBody>
+            </Modal>
         </div>
     )
 }

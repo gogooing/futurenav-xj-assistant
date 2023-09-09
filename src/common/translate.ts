@@ -29,7 +29,8 @@ export type APIModel =
 
 interface BaseTranslateQuery {
     text: string
-    selectedWord: string
+    writing?: boolean
+    selectedWord?: string
     detectFrom: LangCode
     detectTo: LangCode
     mode?: Exclude<TranslateMode, 'big-bang'>
@@ -243,7 +244,7 @@ export async function translate(query: TranslateQuery) {
                 ) {
                     contentPrompt = ''
                 } else {
-                    contentPrompt = '"""' + query.text + '"""'
+                    contentPrompt = query.text
                 }
                 rolePrompt = (query.action.rolePrompt ?? '')
                     .replace('${sourceLang}', sourceLangName)
@@ -258,14 +259,10 @@ export async function translate(query: TranslateQuery) {
                 }
                 break
             case 'translate':
-                quoteProcessor = new QuoteProcessor()
-                commandPrompt = targetLangConfig.genCommandPrompt(
-                    sourceLangConfig,
-                    quoteProcessor.quoteStart,
-                    quoteProcessor.quoteEnd
-                )
-                contentPrompt = `${quoteProcessor.quoteStart}${query.text}${quoteProcessor.quoteEnd}`
-                if (query.text.length < 5 && toChinese) {
+                assistantPrompts = targetLangConfig.genAssistantPrompts()
+                commandPrompt = targetLangConfig.genCommandPrompt(sourceLangConfig)
+                contentPrompt = query.text
+                if (!query.writing && query.text.length < 5 && toChinese) {
                     // 当用户的默认语言为中文时，查询中文词组（不超过5个字），展示多种翻译结果，并阐述适用语境。
                     rolePrompt = codeBlock`
                     ${oneLineTrim`
@@ -282,7 +279,7 @@ export async function translate(query: TranslateQuery) {
                     `
                     commandPrompt = ''
                 }
-                if (isAWord(sourceLangCode, query.text.trim())) {
+                if (!query.writing && isAWord(sourceLangCode, query.text.trim())) {
                     isWordMode = true
                     if (toChinese) {
                         // 单词模式，可以更详细的翻译结果，包括：音标、词性、含义、双语示例。
@@ -318,8 +315,9 @@ export async function translate(query: TranslateQuery) {
                             ${sourceLangName}-${targetLangName} dictionary,
                             and list the original form of the word (if any),
                             the language of the word,
-                            ${targetLangConfig.phoneticNotation &&
-                            'the corresponding phonetic notation or transcription, '
+                            ${
+                                targetLangConfig.phoneticNotation &&
+                                'the corresponding phonetic notation or transcription, '
                             }
                             all senses with parts of speech,
                             ${isSameLanguage ? '' : 'bilingual '}
@@ -347,7 +345,7 @@ Etymology:
                         contentPrompt = `The word is: ${query.text}`
                     }
                 }
-                if (query.selectedWord) {
+                if (!query.writing && query.selectedWord) {
                     rolePrompt = oneLine`
                     You are an expert in the semantic syntax of the ${sourceLangName} language
                     and you are teaching me the ${sourceLangName} language.
@@ -378,7 +376,7 @@ Etymology:
                 quoteProcessor = new QuoteProcessor()
                 commandPrompt = tone ?
                     `Please use the ${tone} tone to polish this text in ${sourceLangName}. Only polish the text between ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.`
-                    : `Please polish this text in ${sourceLangName}. Only polish the text between ${quoteProcessor.quoteStart} and ${quoteProcessor.quoteEnd}.`
+                    : `Please edit the following sentences in ${sourceLangName} to improve clarity, conciseness, and coherence, making them match the expression of native speakers.`
                 contentPrompt = `${quoteProcessor.quoteStart}${query.text}${quoteProcessor.quoteEnd}`
                 break
             case 'summarize':

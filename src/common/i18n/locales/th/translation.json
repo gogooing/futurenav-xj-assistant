@@ -49,6 +49,7 @@
   "i18n": "ภาษา",
   "Hotkey": "ปุ่มลัด",
   "OCR Hotkey": "ปุ่มลัด OCR",
+  "Writing Hotkey": "ปุ่มลัดการเขียน",
   "Please press the hotkey you want to set.": "โปรดกดปุ่มลัดที่คุณต้องการกำหนดมัน",
   "Please press enter": "โปรดกด <Enter> เพื่อส่ง กด <Shift+Enter> เพื่อเริ่มบรรทัดใหม่",
   "Click above to set hotkeys.": "คลิกด้านบนเพื่อตั้งค่าปุ่มลัด",
@@ -127,5 +128,11 @@
   "represents the target language": "แสดงภาษาปลายทาง",
   "represents the original text, which is usually not needed inside the prompt because it is automatically injected": "แสดงข้อความต้นฉบับซึ่งมักจะไม่จำเป็นต้องอยู่ใน prompt เนื่องจากถูกฉีกอัตโนมัติ",
   "Output rendering format": "รูปแบบการแสดงผล",
-  "disable collecting statistics": "ปิดใช้งานการสถิติการเก็บรวบรวม"
+  "disable collecting statistics": "ปิดใช้งานการสถิติการเก็บรวบรวม",
+  "Writing target language": "เขียนภาษาปลายทาง",
+  "Press this shortcut key in the input box of any application, and the text already entered in the input box will be automatically translated into the writing target language.": "กดปุ่มลัดนี้ในกล่องข้อความของแอปพลิเคชันใด ๆ และข้อความที่ป้อนลงในกล่องข้อความจะถูกแปลอัตโนมัติเป็นภาษาปลายทางที่เขียน",
+  "Writing line break shortcut": "การเขียนปุ่มลัดขั้นบันได",
+  "When writing, which key should be pressed when encountering a line break?": "เมื่อเขียน คีย์ใดควรกดเมื่อพบการขัดข้องของบรรทัด?",
+  "If you find this tool helpful, you can buy me a cup of coffee.": "ถ้าคุณพบว่าเครื่องมือนี้เป็นประโยชน์ คุณสามารถซื้อกาแฟให้ฉันได้"
 }
+

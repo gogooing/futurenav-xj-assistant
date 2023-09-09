@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { useTranslation, Trans } from 'react-i18next'
-import toast, { Toaster } from 'react-hot-toast'
+import toast from 'react-hot-toast/headless'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { Provider as StyletronProvider } from 'styletron-react'
 import { BaseProvider } from 'baseui-sd'
@@ -66,6 +66,7 @@ import { countTokens } from '../token'
 import { useLazyEffect } from '../usehooks'
 import LogoWithText, { type LogoWithTextRef } from './LogoWithText'
 import { useTranslatorStore, setEditableText, setOriginalText, setDetectedOriginalText } from '../store'
+import Toaster from './Toaster'
 
 const cache = new LRUCache({
     max: 500,
@@ -446,6 +447,7 @@ export interface MovementXY {
 export interface IInnerTranslatorProps {
     uuid?: string
     text: string
+    writing?: boolean
     autoFocus?: boolean
     showSettings?: boolean
     defaultShowSettings?: boolean
@@ -911,7 +913,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
     }, [autoCollect])
 
     const translateText = useCallback(
-        async (text: string, selectedWord: string, signal: AbortSignal) => {
+        async (text: string, selectedWord: string, writing: boolean, signal: AbortSignal) => {
             if (!text || !sourceLang || !targetLang || !activateAction?.id) {
                 return
             }
@@ -984,7 +986,7 @@ function InnerTranslator(props: IInnerTranslatorProps) {
                         setIsNotLogin(statusCode === 401 || statusCode === 403)
                     },
                     onMessage: (message) => {
-                        if (message.role) {
+                        if (!message.content) {
                             return
                         }
                         setIsWordMode(message.isWordMode)
@@ -1045,11 +1047,11 @@ function InnerTranslator(props: IInnerTranslatorProps) {
         }
         translateControllerRef.current = new AbortController()
         const { signal } = translateControllerRef.current
-        translateText(detectedOriginalText, selectedWord, signal)
+        translateText(detectedOriginalText, selectedWord, props.writing ?? false, signal)
         return () => {
             translateControllerRef.current?.abort()
         }
-    }, [translateText, editableText, detectedOriginalText, selectedWord])
+    }, [translateText, editableText, detectedOriginalText, selectedWord, props.writing])
 
     useEffect(() => {
         if (!props.defaultShowSettings) {
